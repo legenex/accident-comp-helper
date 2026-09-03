@@ -1,0 +1,39 @@
+{
+  "name": "Survey",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "published",
+        "archived"
+      ],
+      "default": "draft"
+    },
+    "description": {
+      "type": "string"
+    },
+    "questions": {
+      "type": "array"
+    },
+    "responses": {
+      "type": "number",
+      "default": 0
+    },
+    "completion_rate": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "title",
+    "slug"
+  ]
+}

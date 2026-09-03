@@ -1,0 +1,79 @@
+{
+  "name": "Experiment",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "path": {
+      "type": "string"
+    },
+    "experiment_type": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "published",
+        "archived"
+      ],
+      "default": "draft"
+    },
+    "build_status": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "in_progress",
+        "beta",
+        "live"
+      ],
+      "default": "planned"
+    },
+    "hero_headline": {
+      "type": "string"
+    },
+    "hero_subheadline": {
+      "type": "string"
+    },
+    "short_description": {
+      "type": "string"
+    },
+    "primary_cta_url": {
+      "type": "string",
+      "default": "https://quiz.accidentcompensationhelper.com/s/eval"
+    },
+    "primary_cta_text": {
+      "type": "string"
+    },
+    "disclaimer_short": {
+      "type": "string"
+    },
+    "utm_medium_label": {
+      "type": "string"
+    },
+    "view_count": {
+      "type": "number",
+      "default": 0
+    },
+    "clicks": {
+      "type": "number",
+      "default": 0
+    },
+    "leads": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "title",
+    "slug",
+    "path"
+  ]
+}

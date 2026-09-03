@@ -1,0 +1,35 @@
+{
+  "name": "Signal",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "reviewing",
+        "promoted",
+        "archived"
+      ],
+      "default": "new"
+    },
+    "score": {
+      "type": "number",
+      "default": 0
+    },
+    "category": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title"
+  ]
+}

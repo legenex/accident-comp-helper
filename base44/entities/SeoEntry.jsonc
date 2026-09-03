@@ -1,0 +1,34 @@
+{
+  "name": "SeoEntry",
+  "type": "object",
+  "properties": {
+    "page_path": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "meta_description": {
+      "type": "string"
+    },
+    "og_title": {
+      "type": "string"
+    },
+    "og_description": {
+      "type": "string"
+    },
+    "keywords": {
+      "type": "string"
+    },
+    "canonical": {
+      "type": "string"
+    },
+    "indexable": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "page_path"
+  ]
+}
