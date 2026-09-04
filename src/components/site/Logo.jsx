@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 export function Mark({ className }) {
   return (
     <svg viewBox="0 0 64 64" className={className} aria-hidden="true">
-      <rect width="64" height="64" rx="14" fill="#0B8DCF" />
+      <rect width="164" height="164" rx="14" fill="#0B8DCF" />
       <path d="M32 14l14 5v9c0 9-6 16-14 19-8-3-14-10-14-19v-9l14-5z" fill="none" stroke="white" strokeWidth="3.5" strokeLinejoin="round" />
       <path d="M25 32l5 5 9-10" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
