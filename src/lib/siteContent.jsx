@@ -49,9 +49,15 @@ export const TRUST_POINTS = [
   { icon: "Scale", title: "Attorney ready", body: "Connect with a participating attorney if you qualify." },
 ];
 
+/**
+ * Facts about how the service operates. Deliberately no claim counts,
+ * settlement figures or star ratings: we cannot substantiate those, and
+ * unverifiable outcome claims are exactly what draws regulatory attention
+ * in this category.
+ */
 export const STATS = [
-  { value: "12,000+", label: "claims checked" },
-  { value: "2 min", label: "average time" },
-  { value: "50 states", label: "coverage" },
-  { value: "100%", label: "free to use" },
+  { value: "2 min", label: "typical time to complete" },
+  { value: "50 states", label: "claim checks accepted" },
+  { value: "$0", label: "cost to use" },
+  { value: "24/7", label: "start whenever you like" },
 ];
