@@ -67,7 +67,7 @@ export default function HeroBackdrop({ slides = [], interval = 8000 }) {
             alt=""
             aria-hidden="true"
             decoding="async"
-            fetchpriority={i === 0 ? "high" : "low"}
+            fetchPriority={i === 0 ? "high" : "low"}
             loading={i === 0 ? "eager" : "lazy"}
             onLoad={() => markLoaded(i)}
             className={[
