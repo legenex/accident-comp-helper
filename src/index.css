@@ -13,13 +13,13 @@
     --card-foreground: 209 36% 17%;
     --popover: 0 0% 100%;
     --popover-foreground: 209 36% 17%;
-    --primary: 200 90% 43%;
+    --primary: 198 98% 40%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 200 86% 95%;
+    --secondary: 198 86% 95%;
     --secondary-foreground: 209 36% 17%;
     --muted: 210 40% 96%;
     --muted-foreground: 215 20% 65%;
-    --accent: 200 90% 43%;
+    --accent: 198 98% 40%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
@@ -29,7 +29,7 @@
     --warning-foreground: 0 0% 100%;
     --border: 210 30% 90%;
     --input: 210 30% 90%;
-    --ring: 200 90% 43%;
+    --ring: 198 98% 40%;
     --radius: 0.625rem;
     --font-heading: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
     --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
@@ -37,12 +37,12 @@
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     --sidebar-background: 209 36% 17%;
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 200 90% 43%;
+    --sidebar-primary: 198 98% 40%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 209 36% 24%;
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 209 36% 26%;
-    --sidebar-ring: 200 90% 43%;
+    --sidebar-ring: 198 98% 40%;
   }
 }
 
@@ -72,12 +72,18 @@
     50% { transform: translateY(-14px); }
   }
   .animate-float-slow { animation: float-slow 12s ease-in-out infinite; }
+
+  /* Slow drift applied to whichever hero frame is currently visible. */
+  @keyframes ken-burns {
+    from { transform: scale(1.06) translate3d(0, 0, 0); }
+    to   { transform: scale(1.16) translate3d(-1.2%, -1.6%, 0); }
+  }
   .text-balance { text-wrap: balance; }
   .shadow-lift {
-    box-shadow: 0 1px 2px rgba(28, 44, 59, 0.05), 0 12px 30px -14px rgba(11, 141, 207, 0.22);
+    box-shadow: 0 1px 2px rgba(28, 44, 59, 0.05), 0 12px 30px -14px rgba(2, 140, 201, 0.22);
   }
   .shadow-float {
-    box-shadow: 0 1px 2px rgba(28, 44, 59, 0.06), 0 24px 48px -18px rgba(11, 141, 207, 0.28);
+    box-shadow: 0 1px 2px rgba(28, 44, 59, 0.06), 0 24px 48px -18px rgba(2, 140, 201, 0.28);
   }
   .prose-legal p { margin-bottom: 1rem; }
   .prose-legal h2 { margin-top: 2rem; margin-bottom: 0.75rem; font-size: 1.25rem; font-weight: 700; }
