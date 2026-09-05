@@ -57,7 +57,7 @@ export default function HeroBackdrop({ slides = [], interval = 8000 }) {
     <div ref={ref} className="pointer-events-none absolute inset-0 overflow-hidden bg-navy">
       {/* photo layer */}
       <div
-        className="absolute inset-[-3%] transition-transform duration-[900ms] ease-out will-change-transform"
+        className="absolute inset-[-3%] transition-transform ease-out will-change-transform [transition-duration:900ms]"
         style={{ transform: `translate3d(${offset.x}px, ${offset.y}px, 0)` }}
       >
         {slides.map((s, i) => (
@@ -71,7 +71,7 @@ export default function HeroBackdrop({ slides = [], interval = 8000 }) {
             loading={i === 0 ? "eager" : "lazy"}
             onLoad={() => markLoaded(i)}
             className={[
-              "absolute inset-0 h-full w-full object-cover transition-opacity duration-[1600ms] ease-in-out",
+              "absolute inset-0 h-full w-full object-cover transition-opacity ease-in-out [transition-duration:1600ms]",
               i === active && loaded[i] ? "opacity-100" : "opacity-0",
               !reduce && i === active ? "animate-ken-burns" : "",
             ].join(" ")}
