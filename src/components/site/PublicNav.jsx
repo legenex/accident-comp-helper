@@ -26,7 +26,14 @@ export default function PublicNav() {
 
   return (
     <>
-      <header className={cn("fixed inset-x-0 top-0 z-50 bg-navy transition-shadow", scrolled && "shadow-lift")}>
+      <header
+        className={cn(
+          "fixed inset-x-0 top-0 z-50 transition-all duration-300",
+          scrolled
+            ? "bg-navy/95 shadow-lift backdrop-blur-md"
+            : "bg-gradient-to-b from-navy/70 to-transparent"
+        )}
+      >
         <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-5 sm:px-8">
           <Link to="/" className="flex items-center" aria-label="Accident Compensation Helper home">
             <Logo variant="light" />
