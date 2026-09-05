@@ -35,7 +35,7 @@ module.exports = {
           accent: 'hsl(var(--sidebar-accent))', 'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
           border: 'hsl(var(--sidebar-border))', ring: 'hsl(var(--sidebar-ring))'
         },
-        brand: { DEFAULT: '#0B8DCF', hover: '#0A7AB4' },
+        brand: { DEFAULT: '#028CC9', hover: '#0277A9', soft: '#E6F4FB' },
         navy: '#1C2C3B',
         panel: '#24384A',
         panel2: '#2B4258',
@@ -54,7 +54,8 @@ module.exports = {
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
-        'accordion-up': 'accordion-up 0.2s ease-out'
+        'accordion-up': 'accordion-up 0.2s ease-out',
+        'ken-burns': 'ken-burns 22s ease-out forwards'
       }
     }
   },
