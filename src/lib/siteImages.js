@@ -49,9 +49,9 @@ export const HERO_SLIDES = [
     focus: "55% 50%",
   },
   {
-    id: "photo-1713623311317-d3c43a4be4cf",
-    alt: "Two cars crashed together at the scene of a collision",
-    focus: "50% 50%",
+    id: "photo-1673187139211-1e7ec3dd60ec",
+    alt: "A vehicle loaded onto a flatbed tow truck after a collision",
+    focus: "55% 50%",
   },
 ];
 
