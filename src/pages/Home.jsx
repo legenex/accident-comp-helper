@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   ShieldCheck, Lock, Clock, ArrowRight, Scale, Car, Truck, Bike,
-  PersonStanding, HardHat, Footprints, FileText, Users, Phone,
+  PersonStanding, HardHat, Footprints, FileText, Users, Phone, ChevronDown,
 } from "lucide-react";
 import { CTAButton, Section, SectionHeading } from "@/components/site/ui";
 import HeroBackdrop from "@/components/site/HeroBackdrop";
@@ -22,47 +22,110 @@ const rise = {
   }),
 };
 
+const MOTOR_TYPES = ["car", "truck", "motorcycle", "rideshare", "pedestrian"];
+
+const heroContainer = {
+  hidden: {},
+  show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } },
+};
+const heroItem = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
+};
+
+function RotatingAccident() {
+  const [i, setI] = useState(0);
+  const reduce = useReducedMotion();
+  useEffect(() => {
+    if (reduce) return;
+    const t = setInterval(() => setI((p) => (p + 1) % MOTOR_TYPES.length), 2200);
+    return () => clearInterval(t);
+  }, [reduce]);
+  return (
+    <span className="relative inline-block">
+      <AnimatePresence mode="popLayout" initial={false}>
+        <motion.span
+          key={MOTOR_TYPES[i]}
+          initial={{ opacity: 0, y: reduce ? 0 : "0.5em" }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: reduce ? 0 : "-0.5em" }}
+          transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+          className="bg-gradient-to-r from-brand via-sky-300 to-teal-300 bg-clip-text text-transparent"
+        >
+          {MOTOR_TYPES[i]}
+        </motion.span>
+      </AnimatePresence>
+    </span>
+  );
+}
+
 function Hero() {
+  const reduce = useReducedMotion();
   return (
     <section className="relative isolate overflow-hidden">
       <HeroBackdrop slides={HERO_SLIDES} />
 
-      <div className="relative mx-auto grid max-w-[1280px] items-center gap-10 px-5 pb-20 pt-28 sm:px-8 lg:grid-cols-[1.05fr_minmax(0,420px)] lg:gap-14 lg:pb-28 lg:pt-36">
-        <motion.div initial="hidden" animate="show" variants={rise} className="text-white">
-          <span className="inline-flex w-fit items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-semibold backdrop-blur-md">
+      {/* animated accent glows */}
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-24 top-24 h-72 w-72 rounded-full bg-brand/25 blur-3xl"
+        animate={reduce ? {} : { opacity: [0.35, 0.6, 0.35], scale: [1, 1.12, 1] }}
+        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+      />
+      <motion.div
+        aria-hidden="true"
+        className="pointer-events-none absolute right-[-6rem] top-1/2 h-80 w-80 rounded-full bg-sky-400/15 blur-3xl"
+        animate={reduce ? {} : { opacity: [0.2, 0.45, 0.2], scale: [1.05, 1, 1.05] }}
+        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+      />
+
+      <div className="relative mx-auto grid max-w-[1280px] items-center gap-10 px-5 pb-24 pt-28 sm:px-8 lg:grid-cols-[1.05fr_minmax(0,420px)] lg:gap-14 lg:pb-32 lg:pt-36">
+        <motion.div initial="hidden" animate="show" variants={heroContainer} className="text-white">
+          <motion.span
+            variants={heroItem}
+            className="inline-flex w-fit items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-semibold backdrop-blur-md"
+          >
             <span className="relative flex h-2 w-2">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-brand" />
             </span>
             Free and confidential claim check
-          </span>
+          </motion.span>
 
-          <h1 className="mt-6 font-heading text-[2.75rem] font-extrabold leading-[1.03] tracking-tight drop-shadow-sm sm:text-6xl lg:text-[4.25rem]">
-            Injured in an
-            <br className="hidden sm:block" /> accident?
-          </h1>
+          <motion.h1
+            variants={heroItem}
+            className="mt-6 font-heading font-extrabold leading-[1.03] tracking-tight drop-shadow-sm text-[clamp(2.25rem,6vw,4.25rem)]"
+          >
+            Injured in a <RotatingAccident /> accident?
+          </motion.h1>
 
-          <p className="mt-5 max-w-xl font-heading text-xl font-semibold leading-snug sm:text-2xl">
+          <motion.p
+            variants={heroItem}
+            className="mt-5 max-w-xl font-heading text-xl font-semibold leading-snug sm:text-2xl"
+          >
             Find out in two minutes whether you may qualify for{" "}
             <span className="bg-gradient-to-r from-brand via-sky-300 to-teal-300 bg-clip-text text-transparent">
               compensation
             </span>
             .
-          </p>
+          </motion.p>
 
-          <p className="mt-5 max-w-lg text-base leading-relaxed text-white/75">
+          <motion.p variants={heroItem} className="mt-5 max-w-lg text-base leading-relaxed text-white/75">
             Answer a few questions about what happened. We will help you understand whether your
             situation may be worth discussing with a participating personal injury attorney. It is
             free, and there is no obligation to go any further.
-          </p>
+          </motion.p>
 
-          <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2.5 text-sm text-white/70">
+          <motion.div
+            variants={heroItem}
+            className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-2.5 text-sm text-white/70"
+          >
             <span className="inline-flex items-center gap-2"><Clock className="h-4 w-4 text-brand" /> Takes about 2 minutes</span>
             <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-brand" /> Free to use</span>
             <span className="inline-flex items-center gap-2"><Lock className="h-4 w-4 text-brand" /> Handled securely</span>
-          </div>
+          </motion.div>
 
-          <div className="mt-9 flex flex-wrap items-center gap-4">
+          <motion.div variants={heroItem} className="mt-9 flex flex-wrap items-center gap-4">
             <CTAButton size="lg">Start the claim check</CTAButton>
             <Link
               to="/how-it-works"
@@ -70,13 +133,29 @@ function Hero() {
             >
               See how it works
             </Link>
-          </div>
+          </motion.div>
         </motion.div>
 
         <div className="flex justify-center lg:justify-end">
           <ClaimStarter />
         </div>
       </div>
+
+      {/* scroll cue */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.1 }}
+        className="pointer-events-none absolute bottom-6 left-1/2 hidden -translate-x-1/2 lg:flex flex-col items-center gap-1 text-white/45"
+      >
+        <span className="text-[10px] font-semibold uppercase tracking-[0.22em]">Scroll</span>
+        <motion.span
+          animate={reduce ? {} : { y: [0, 6, 0] }}
+          transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <ChevronDown className="h-4 w-4" />
+        </motion.span>
+      </motion.div>
     </section>
   );
 }

@@ -49,9 +49,9 @@ export const HERO_SLIDES = [
     focus: "55% 50%",
   },
   {
-    id: "photo-1454165804606-c3d57bc86b40",
-    alt: "A conversation across a desk about next steps",
-    focus: "65% 45%",
+    id: "photo-1503376780353-7e6692767b70",
+    alt: "A car on an open road",
+    focus: "60% 50%",
   },
 ];
 
