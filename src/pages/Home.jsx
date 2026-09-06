@@ -22,7 +22,7 @@ const rise = {
   }),
 };
 
-const MOTOR_TYPES = ["car", "truck", "motorcycle", "rideshare", "pedestrian"];
+const ACCIDENT_WORDS = ["car", "truck", "motorcycle", "rideshare", "pedestrian", "workplace"];
 
 const heroContainer = {
   hidden: {},
@@ -38,21 +38,21 @@ function RotatingAccident() {
   const reduce = useReducedMotion();
   useEffect(() => {
     if (reduce) return;
-    const t = setInterval(() => setI((p) => (p + 1) % MOTOR_TYPES.length), 2200);
+    const t = setInterval(() => setI((p) => (p + 1) % ACCIDENT_WORDS.length), 2200);
     return () => clearInterval(t);
   }, [reduce]);
   return (
     <span className="relative inline-block">
       <AnimatePresence mode="popLayout" initial={false}>
         <motion.span
-          key={MOTOR_TYPES[i]}
+          key={ACCIDENT_WORDS[i]}
           initial={{ opacity: 0, y: reduce ? 0 : "0.5em" }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: reduce ? 0 : "-0.5em" }}
           transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
           className="bg-gradient-to-r from-brand via-sky-300 to-teal-300 bg-clip-text text-transparent"
         >
-          {MOTOR_TYPES[i]}
+          {ACCIDENT_WORDS[i]}
         </motion.span>
       </AnimatePresence>
     </span>

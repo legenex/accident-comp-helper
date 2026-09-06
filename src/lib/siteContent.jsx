@@ -21,11 +21,9 @@ export const ACCIDENT_TYPES = [
   { slug: "auto-accidents", title: "Auto Accidents", icon: "Car", blurb: "Rear-end, intersection, highway and multi-vehicle collisions." },
   { slug: "truck-accidents", title: "Truck Accidents", icon: "Truck", blurb: "Collisions involving commercial semi and delivery trucks." },
   { slug: "motorcycle-accidents", title: "Motorcycle Accidents", icon: "Bike", blurb: "Serious injuries from motorcycle crashes and right-of-way failures." },
-  { slug: "slip-and-fall", title: "Slip and Fall", icon: "PersonStanding", blurb: "Premises liability for unsafe floors, stairs and walkways." },
   { slug: "workplace-injury", title: "Workplace Injury", icon: "HardHat", blurb: "On-the-job injuries beyond standard workers' comp claims." },
   { slug: "pedestrian-accidents", title: "Pedestrian Accidents", icon: "Footprints", blurb: "Crosswalk and roadside injuries involving pedestrians." },
   { slug: "rideshare-accidents", title: "Rideshare Accidents", icon: "Car", blurb: "Uber, Lyft and other rideshare collision claims." },
-  { slug: "wrongful-death", title: "Wrongful Death", icon: "Scale", blurb: "Claims for families who have lost a loved one to negligence." },
 ];
 
 export const STEPS = [
@@ -39,7 +37,7 @@ export const FAQS = [
   { q: "Are you a law firm?", a: "No. Accident Compensation Helper is not a law firm and does not provide legal advice. If you qualify, we can help you request contact with a participating attorney." },
   { q: "How long does it take?", a: "The claim check takes about two minutes. You answer a few questions about what happened and get an immediate read." },
   { q: "Will my information be shared?", a: "Your answers are kept confidential. We only share details with a participating attorney if you choose to request contact." },
-  { q: "What kinds of accidents qualify?", a: "Auto, truck, motorcycle, slip and fall, workplace, pedestrian, rideshare and other injury accidents may qualify. Start the check to find out." },
+  { q: "What kinds of accidents qualify?", a: "Motor vehicle accidents (auto, truck, motorcycle, rideshare and pedestrian) and workplace injuries may qualify. Start the check to find out." },
 ];
 
 export const TRUST_POINTS = [

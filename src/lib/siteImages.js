@@ -39,19 +39,19 @@ export function photo(id, { w = 1800, q = 70, ar } = {}) {
  */
 export const HERO_SLIDES = [
   {
-    id: "photo-1541888946425-d81bb19240f5",
-    alt: "Traffic moving along a road at dusk",
-    focus: "60% 55%",
-  },
-  {
-    id: "photo-1502224562085-639556652f33",
-    alt: "View through a rain-covered windscreen",
+    id: "photo-1597328290883-50c5787b7c7e",
+    alt: "Damaged vehicle with a crushed hood at the scene of a collision",
     focus: "55% 50%",
   },
   {
-    id: "photo-1503376780353-7e6692767b70",
-    alt: "A car on an open road",
-    focus: "60% 50%",
+    id: "photo-1662541547523-118842914aa7",
+    alt: "Car with a smashed front end after an accident",
+    focus: "55% 50%",
+  },
+  {
+    id: "photo-1713623311317-d3c43a4be4cf",
+    alt: "Two cars crashed together at the scene of a collision",
+    focus: "50% 50%",
   },
 ];
 
@@ -63,11 +63,9 @@ export const ACCIDENT_PHOTOS = {
   "auto-accidents": "photo-1503376780353-7e6692767b70",
   "truck-accidents": "photo-1502877338535-766e1452684a",
   "motorcycle-accidents": "photo-1449965408869-eaa3f722e40d",
-  "slip-and-fall": "photo-1450101499163-c8848c66ca85",
   "workplace-injury": "photo-1436450412740-6b988f486c6b",
   "pedestrian-accidents": "photo-1444723121867-7a241cacace9",
   "rideshare-accidents": "photo-1502224562085-639556652f33",
-  "wrongful-death": "photo-1589829545856-d10d557cf95f",
 };
 
 /** Wide editorial band used beside the "how it works" / trust copy. */
