@@ -79,6 +79,19 @@ export const SUPPORT_PHOTOS = {
 };
 
 /**
+ * RESOURCE GUIDES — keys match the `key` field on each entry in the
+ * RESOURCES array in pages/Resources.jsx.
+ */
+export const RESOURCE_PHOTOS = {
+  "after-a-crash": "photo-1503376780353-7e6692767b70",
+  "settlement-offer": "photo-1554224155-6726b3ff858f",
+  "statute-of-limitations": "photo-1423666639041-f56000c27a9a",
+  "documenting-injuries": "photo-1576091160399-112ba8d25d1d",
+  "talk-to-an-attorney": "photo-1454165804606-c3d57bc86b40",
+  "insurance-adjusters": "photo-1517048676732-d65bc937f952",
+};
+
+/**
  * PAGE HEROES — the banner photo behind the title on every inner page.
  * Keys are the route paths. Anything not listed here falls back to a
  * plain navy gradient, which is a perfectly fine default.
