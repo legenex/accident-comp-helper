@@ -73,7 +73,46 @@ export const SUPPORT_PHOTOS = {
   consultation: "photo-1600880292203-757bb62b4baf",
   paperwork: "photo-1554224155-6726b3ff858f",
   recovery: "photo-1576091160399-112ba8d25d1d",
+  handshake: "photo-1521791136064-7986c2920216",
+  team: "photo-1521737711867-e3b97375f902",
+  notes: "photo-1450101499163-c8848c66ca85",
 };
+
+/**
+ * PAGE HEROES — the banner photo behind the title on every inner page.
+ * Keys are the route paths. Anything not listed here falls back to a
+ * plain navy gradient, which is a perfectly fine default.
+ */
+export const PAGE_HERO_PHOTOS = {
+  "/accident-types": { id: "photo-1444723121867-7a241cacace9", focus: "50% 60%" },
+  "/how-it-works": { id: "photo-1454165804606-c3d57bc86b40", focus: "60% 45%" },
+  "/about": { id: "photo-1521737711867-e3b97375f902", focus: "55% 40%" },
+  "/resources": { id: "photo-1450101499163-c8848c66ca85", focus: "50% 50%" },
+  "/blog": { id: "photo-1423666639041-f56000c27a9a", focus: "50% 45%" },
+  "/faq": { id: "photo-1517048676732-d65bc937f952", focus: "55% 45%" },
+  "/contact": { id: "photo-1521791136064-7986c2920216", focus: "50% 45%" },
+  legal: { id: "photo-1554224155-6726b3ff858f", focus: "50% 50%" },
+};
+
+/**
+ * Fallback covers for blog posts that have no `featured_image` set yet.
+ * Picked deterministically from the post slug so a given article always
+ * shows the same image rather than shuffling on every render.
+ */
+export const BLOG_FALLBACK_COVERS = [
+  "photo-1450101499163-c8848c66ca85",
+  "photo-1554224155-6726b3ff858f",
+  "photo-1423666639041-f56000c27a9a",
+  "photo-1517048676732-d65bc937f952",
+  "photo-1454165804606-c3d57bc86b40",
+];
+
+/** Stable index into BLOG_FALLBACK_COVERS derived from any string key. */
+export function coverFor(key = "") {
+  let h = 0;
+  for (let i = 0; i < key.length; i += 1) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+  return BLOG_FALLBACK_COVERS[h % BLOG_FALLBACK_COVERS.length];
+}
 
 /**
  * A 1px transparent GIF used as the <img> src until the real file has
