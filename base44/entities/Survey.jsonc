@@ -30,6 +30,10 @@
     "completion_rate": {
       "type": "number",
       "default": 0
+    },
+    "completion_routing": {
+      "type": "object",
+      "description": "Where a completed (or disqualified) respondent lands, configured per flow rather than hardcoded. e.g. { qualified_url: '/submitted', disqualified_url: '/thanks', fallback_url: '/thanks' }. Disqualification is always resolved at the END of the flow."
     }
   },
   "required": [
