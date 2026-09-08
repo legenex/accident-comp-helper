@@ -1,0 +1,28 @@
+{
+  "name": "KnowledgeBaseItem",
+  "type": "object",
+  "description": "One shared grounding library entry, assignable to consumers (Bot, Blog Manager AI generation) with a retrieval test.",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "content": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string"
+    },
+    "assigned_to": {
+      "type": "array",
+      "description": "e.g. ['bot','blog']"
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": [
+    "title",
+    "content"
+  ]
+}
