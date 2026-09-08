@@ -1,0 +1,41 @@
+{
+  "name": "ProgrammaticSEOTemplate",
+  "type": "object",
+  "description": "A page template with a variable matrix that expands into many draft pages. Always outputs drafts, never auto-published.",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "url_pattern": {
+      "type": "string",
+      "description": "e.g. /accident-lawyer/{state}/{city}"
+    },
+    "title_template": {
+      "type": "string"
+    },
+    "body_template": {
+      "type": "string"
+    },
+    "variables": {
+      "type": "object",
+      "description": "Variable name -> array of values, e.g. { state: [...], city: [...] }"
+    },
+    "per_template_limit": {
+      "type": "number",
+      "default": 200
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "archived"
+      ],
+      "default": "draft"
+    }
+  },
+  "required": [
+    "name",
+    "url_pattern"
+  ]
+}
