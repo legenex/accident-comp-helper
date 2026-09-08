@@ -1,0 +1,50 @@
+{
+  "name": "ContactForm",
+  "type": "object",
+  "description": "A configured contact form. Fields are selected from the CustomField registry, never invented. Public renderer submits into the canonical Lead pipeline.",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "field_keys": {
+      "type": "array",
+      "description": "CustomField.canonical_name values, in display order"
+    },
+    "presentation_overrides": {
+      "type": "object",
+      "description": "Per-field label/placeholder overrides keyed by canonical_name; the canonical name itself never changes"
+    },
+    "hidden_capture_enabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "submit_button_text": {
+      "type": "string",
+      "default": "Send message"
+    },
+    "success_message": {
+      "type": "string",
+      "default": "Thanks for reaching out. We will reply soon."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "published",
+        "archived"
+      ],
+      "default": "draft"
+    },
+    "submission_count": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "slug"
+  ]
+}
