@@ -1,0 +1,147 @@
+{
+  "name": "Lead",
+  "type": "object",
+  "description": "The central record. Canonical field names plus calculated outputs. Captured either via the ingestLead function (external quiz at quiz.accidentcompensationhelper.com posting completed submissions) or the on-site Contact form.",
+  "properties": {
+    "first_name": {
+      "type": "string"
+    },
+    "last_name": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "mobile": {
+      "type": "string"
+    },
+    "zip_code": {
+      "type": "string"
+    },
+    "accident_type": {
+      "type": "string",
+      "description": "e.g. auto, slip_and_fall, workplace, dog_bite"
+    },
+    "accident_state": {
+      "type": "string"
+    },
+    "incident_date": {
+      "type": "string",
+      "description": "ISO date the accident occurred"
+    },
+    "injured": {
+      "type": "boolean"
+    },
+    "injury_type": {
+      "type": "string"
+    },
+    "treatment": {
+      "type": "string",
+      "description": "e.g. none, er_only, ongoing"
+    },
+    "medical_bills": {
+      "type": "string"
+    },
+    "lost_wages": {
+      "type": "string"
+    },
+    "fault": {
+      "type": "string",
+      "description": "e.g. other_party, me, unsure"
+    },
+    "attorney": {
+      "type": "string",
+      "description": "e.g. none, consulting, retained"
+    },
+    "qualification_status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "qualified",
+        "soft_dq",
+        "hard_dq",
+        "sold",
+        "unsold",
+        "returned"
+      ],
+      "default": "new",
+      "description": "Resolved once, at the end of the flow. A disqualifying answer sets this but the respondent still completes the flow."
+    },
+    "disqualify_reason": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string",
+      "description": "e.g. quiz, contact_form, advertorial, landing_page"
+    },
+    "source_ref": {
+      "type": "string",
+      "description": "slug/id of the advertorial, landing page, or survey that captured this lead"
+    },
+    "utm_source": {
+      "type": "string"
+    },
+    "utm_medium": {
+      "type": "string"
+    },
+    "utm_campaign": {
+      "type": "string"
+    },
+    "utm_content": {
+      "type": "string"
+    },
+    "utm_term": {
+      "type": "string"
+    },
+    "ad_label": {
+      "type": "string"
+    },
+    "gclid": {
+      "type": "string"
+    },
+    "fbclid": {
+      "type": "string"
+    },
+    "landing_url": {
+      "type": "string"
+    },
+    "referrer_url": {
+      "type": "string"
+    },
+    "ip_address": {
+      "type": "string"
+    },
+    "user_agent": {
+      "type": "string"
+    },
+    "consent_text": {
+      "type": "string"
+    },
+    "consent_version": {
+      "type": "string"
+    },
+    "consent_timestamp": {
+      "type": "string"
+    },
+    "consent_cert_url": {
+      "type": "string",
+      "description": "TCPA-style consent certificate URL, if the capture surface provides one"
+    },
+    "custom_fields": {
+      "type": "object",
+      "description": "Values for CustomField-registry fields not promoted to a canonical column"
+    },
+    "calculated_fields": {
+      "type": "object",
+      "description": "Keyed by CalculatedField token. Populated by runCalculatedFields; a defined field with no entry means 'not produced', not hidden."
+    },
+    "raw_payload": {
+      "type": "object",
+      "description": "The exact payload received at capture, for debugging a mapping mismatch"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": []
+}
