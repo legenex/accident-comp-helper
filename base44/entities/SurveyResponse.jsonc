@@ -1,0 +1,33 @@
+{
+  "name": "SurveyResponse",
+  "type": "object",
+  "description": "One respondent's answers to a Survey built in the admin. Used for per-question breakdowns and completion rate; separate from Lead, which is the canonical capture record.",
+  "properties": {
+    "survey_id": {
+      "type": "string"
+    },
+    "lead_id": {
+      "type": "string",
+      "description": "Set once the response resolves to a captured Lead"
+    },
+    "answers": {
+      "type": "object",
+      "description": "Keyed by question id"
+    },
+    "completed": {
+      "type": "boolean",
+      "default": false
+    },
+    "current_step": {
+      "type": "number",
+      "default": 0
+    },
+    "disqualified": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "survey_id"
+  ]
+}
