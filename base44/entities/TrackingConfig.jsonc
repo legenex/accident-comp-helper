@@ -1,0 +1,43 @@
+{
+  "name": "TrackingConfig",
+  "type": "object",
+  "description": "Pixel and server-side event configuration only. Reporting on what these events actually produced lives in Analytics, not here.",
+  "properties": {
+    "provider": {
+      "type": "string",
+      "enum": [
+        "meta",
+        "google_ads",
+        "tiktok",
+        "taboola",
+        "ga4"
+      ]
+    },
+    "pixel_id": {
+      "type": "string"
+    },
+    "server_side_enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "capi_secret_ref": {
+      "type": "string",
+      "description": "Secret reference name for the server-side conversions API token"
+    },
+    "event_name_lead": {
+      "type": "string",
+      "default": "Lead"
+    },
+    "event_name_qualified": {
+      "type": "string",
+      "default": "QualifiedLead"
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "provider"
+  ]
+}
