@@ -1,0 +1,54 @@
+{
+  "name": "CalculatedField",
+  "type": "object",
+  "description": "Derivation rules run by the runCalculatedFields engine: on ingest, on change, and before every outbound webhook payload is built.",
+  "properties": {
+    "token": {
+      "type": "string",
+      "description": "Unique output key. Written to Lead.calculated_fields[token]."
+    },
+    "label": {
+      "type": "string"
+    },
+    "vertical": {
+      "type": "string",
+      "default": "personal_injury"
+    },
+    "input_field": {
+      "type": "string",
+      "description": "A Lead canonical field, a Lead.custom_fields key, or another calculated field's token (see depends_on)"
+    },
+    "depends_on": {
+      "type": "array",
+      "description": "Other CalculatedField tokens this rule consumes. Used for dependency ordering and cycle detection."
+    },
+    "transform_type": {
+      "type": "string",
+      "enum": [
+        "value_map",
+        "date_age_bucket",
+        "clone",
+        "conditional",
+        "script"
+      ],
+      "default": "value_map"
+    },
+    "config": {
+      "type": "object",
+      "description": "Transform-specific configuration.\n- value_map: { mappings: [{from,to}], case_insensitive_fallback: bool, default }\n- date_age_bucket: { buckets: [{max_days, value}] (ascending, first fit wins), fallback }\n- clone: {} (copies input straight to output)\n- conditional: { rule_groups: [{ logic: 'ALL'|'ANY', conditions: [{field, operator, value}], output }], fallback_template: '{{token}}' }\n- script: { whitelisted_transform: 'uppercase'|'lowercase'|'trim'|'title_case'|'digits_only'|'concat' }"
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "sort_order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "token",
+    "label",
+    "transform_type"
+  ]
+}
