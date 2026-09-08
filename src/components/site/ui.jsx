@@ -1,8 +1,9 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { QUIZ_URL } from "@/lib/siteContent";
+import { PAGE_HERO_PHOTOS, photo } from "@/lib/siteImages";
 
 export function CTAButton({ to = QUIZ_URL, children = "Check My Claim", className, external = true, size = "md" }) {
   const sizes = { md: "px-6 py-3 text-sm", lg: "px-7 py-4 text-base" };
@@ -45,13 +46,66 @@ export function Section({ id, className, children }) {
   );
 }
 
-export function PageHero({ title, subtitle, eyebrow }) {
+/**
+ * Banner at the top of every inner page.
+ *
+ * It resolves its own photo from the current route via PAGE_HERO_PHOTOS,
+ * so adding or changing a banner image is a one-line edit in siteImages.js
+ * and never needs a change here or in the page itself. Pass `image` to
+ * override, or `image={null}` for a plain navy banner.
+ */
+export function PageHero({ title, subtitle, eyebrow, image, cta = false, children }) {
+  const { pathname } = useLocation();
+  const resolved =
+    image === null
+      ? null
+      : image || PAGE_HERO_PHOTOS[pathname] || PAGE_HERO_PHOTOS.legal;
+
   return (
-    <section className="bg-navy pt-28 pb-16 text-white">
-      <div className="mx-auto max-w-[1280px] px-5 sm:px-8">
-        {eyebrow && <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-brand">{eyebrow}</div>}
-        <h1 className="max-w-3xl font-heading text-4xl font-extrabold tracking-tight sm:text-5xl">{title}</h1>
-        {subtitle && <p className="mt-5 max-w-2xl text-lg text-white/70">{subtitle}</p>}
+    <section className="relative isolate overflow-hidden bg-navy pb-16 pt-32 text-white sm:pb-20 sm:pt-36">
+      {resolved && (
+        <img
+          src={photo(resolved.id, { w: 1800, q: 62 })}
+          alt=""
+          aria-hidden="true"
+          decoding="async"
+          className="absolute inset-0 h-full w-full scale-[1.04] object-cover"
+          style={{ objectPosition: resolved.focus || "50% 50%" }}
+        />
+      )}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: resolved
+            ? "linear-gradient(100deg, rgba(28,44,59,0.96) 0%, rgba(28,44,59,0.9) 42%, rgba(28,44,59,0.66) 72%, rgba(28,44,59,0.5) 100%)"
+            : "radial-gradient(900px 420px at 15% -20%, rgba(2,140,201,0.3), transparent)",
+        }}
+      />
+      {resolved && (
+        <div
+          className="absolute inset-0 mix-blend-soft-light"
+          style={{ background: "linear-gradient(115deg, rgba(2,140,201,0.5), transparent 60%)" }}
+        />
+      )}
+      <div
+        className="absolute inset-x-0 bottom-0 h-24"
+        style={{ background: "linear-gradient(to bottom, transparent, rgba(28,44,59,0.75))" }}
+      />
+
+      <div className="relative mx-auto max-w-[1280px] px-5 sm:px-8">
+        {eyebrow && (
+          <div className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-brand">{eyebrow}</div>
+        )}
+        <h1 className="max-w-3xl font-heading text-4xl font-extrabold tracking-tight drop-shadow-sm sm:text-5xl">
+          {title}
+        </h1>
+        {subtitle && <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/75">{subtitle}</p>}
+        {cta && (
+          <div className="mt-8">
+            <CTAButton>Check My Claim</CTAButton>
+          </div>
+        )}
+        {children}
       </div>
     </section>
   );
