@@ -1,0 +1,38 @@
+{
+  "name": "ProgrammaticSEOJob",
+  "type": "object",
+  "description": "One expansion run of a ProgrammaticSEOTemplate \u2014 the preview/generate job, with slug-collision detection results.",
+  "properties": {
+    "template_id": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "previewing",
+        "generating",
+        "completed",
+        "failed"
+      ],
+      "default": "previewing"
+    },
+    "planned_count": {
+      "type": "number",
+      "default": 0
+    },
+    "generated_count": {
+      "type": "number",
+      "default": 0
+    },
+    "collisions": {
+      "type": "array",
+      "description": "Slugs that already existed and were skipped"
+    },
+    "error_message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "template_id"
+  ]
+}
