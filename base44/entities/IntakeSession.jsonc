@@ -1,0 +1,28 @@
+{
+  "name": "IntakeSession",
+  "type": "object",
+  "description": "State for a structured conversational intake flow (bot-driven case intake), separate from BotConversation's raw transcript.",
+  "properties": {
+    "session_id": {
+      "type": "string"
+    },
+    "lead_id": {
+      "type": "string"
+    },
+    "collected_fields": {
+      "type": "object"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "in_progress",
+        "completed",
+        "abandoned"
+      ],
+      "default": "in_progress"
+    }
+  },
+  "required": [
+    "session_id"
+  ]
+}
