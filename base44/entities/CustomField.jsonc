@@ -1,0 +1,65 @@
+{
+  "name": "CustomField",
+  "type": "object",
+  "description": "The field registry \u2014 the dictionary everything else references. Forms, surveys, webhook mappings and detail views all select from it. No feature invents its own field name.",
+  "properties": {
+    "canonical_name": {
+      "type": "string",
+      "description": "e.g. accident_state \u2014 matches a Lead property or a custom_fields key"
+    },
+    "label": {
+      "type": "string"
+    },
+    "field_type": {
+      "type": "string",
+      "enum": [
+        "text",
+        "textarea",
+        "number",
+        "boolean",
+        "select",
+        "multiselect",
+        "date",
+        "email",
+        "phone"
+      ],
+      "default": "text"
+    },
+    "category": {
+      "type": "string",
+      "description": "e.g. contact, case, qualification, attribution"
+    },
+    "required": {
+      "type": "boolean",
+      "default": false
+    },
+    "options": {
+      "type": "array",
+      "description": "For select/multiselect: [{value,label}]"
+    },
+    "downstream_mapping_key": {
+      "type": "string",
+      "description": "The field name a downstream buyer/system expects for this value, if different from canonical_name"
+    },
+    "is_canonical": {
+      "type": "boolean",
+      "default": false,
+      "description": "True when this maps to a real Lead column rather than living in custom_fields"
+    },
+    "deprecated": {
+      "type": "boolean",
+      "default": false
+    },
+    "deprecated_note": {
+      "type": "string"
+    },
+    "sort_order": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "canonical_name",
+    "label"
+  ]
+}
