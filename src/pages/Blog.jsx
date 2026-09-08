@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { PageHero, Section } from "@/components/site/ui";
 import { base44 } from "@/api/base44Client";
 import { Clock, ArrowRight } from "lucide-react";
+import { coverFor, photo } from "@/lib/siteImages";
 
 export default function Blog() {
   const [posts, setPosts] = useState([]);
@@ -31,19 +32,42 @@ export default function Blog() {
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {posts.map((p) => (
-              <Link key={p.id} to={`/blog/${p.slug}`} className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-lift transition-all hover:-translate-y-1 hover:border-brand/40">
-                <div className="h-40 w-full bg-gradient-to-br from-secondary to-brand/20" />
-                <div className="flex flex-1 flex-col p-6">
-                  {p.category && <span className="text-xs font-semibold uppercase tracking-wider text-brand">{p.category}</span>}
-                  <h3 className="mt-2 font-heading text-lg font-bold text-navy">{p.title}</h3>
-                  <p className="mt-2 flex-1 text-sm text-admuted">{p.excerpt}</p>
-                  <span className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-brand">
-                    Read more <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </div>
-              </Link>
-            ))}
+            {posts.map((p) => {
+              // Use the post's own featured_image when the editor has set
+              // one, otherwise fall back to a stable stock cover so the grid
+              // never shows an empty gradient block.
+              const cover = p.featured_image || photo(coverFor(p.slug || p.id || p.title), { w: 640, q: 65 });
+              return (
+                <Link
+                  key={p.id}
+                  to={`/blog/${p.slug}`}
+                  className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-white shadow-lift transition-all duration-300 hover:-translate-y-1 hover:border-brand/40 hover:shadow-float"
+                >
+                  <div className="relative h-44 w-full overflow-hidden bg-navy">
+                    <img
+                      src={cover}
+                      alt=""
+                      aria-hidden="true"
+                      loading="lazy"
+                      decoding="async"
+                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.06]"
+                    />
+                    {p.category && (
+                      <span className="absolute left-4 top-4 rounded-full bg-navy/80 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white backdrop-blur-md">
+                        {p.category}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex flex-1 flex-col p-6">
+                    <h3 className="font-heading text-lg font-bold leading-snug text-navy">{p.title}</h3>
+                    <p className="mt-2 flex-1 text-sm leading-relaxed text-admuted">{p.excerpt}</p>
+                    <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand">
+                      Read more <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </Section>
