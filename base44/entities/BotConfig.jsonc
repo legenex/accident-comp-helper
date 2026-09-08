@@ -1,0 +1,40 @@
+{
+  "name": "BotConfig",
+  "type": "object",
+  "description": "Singleton \u2014 ClaimBot appearance, behaviour, placement, model, and knowledge assignment. Configuration only; operational views (conversations, test) live under the Bot admin page.",
+  "properties": {
+    "enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "display_name": {
+      "type": "string",
+      "default": "Claim Assistant"
+    },
+    "greeting_message": {
+      "type": "string"
+    },
+    "placement": {
+      "type": "string",
+      "enum": [
+        "bottom_right",
+        "bottom_left",
+        "inline"
+      ],
+      "default": "bottom_right"
+    },
+    "model": {
+      "type": "string",
+      "default": "default"
+    },
+    "knowledge_base_ids": {
+      "type": "array",
+      "description": "KnowledgeBaseItem ids assigned to this bot"
+    },
+    "handoff_url": {
+      "type": "string",
+      "default": "https://quiz.accidentcompensationhelper.com/s/eval"
+    }
+  },
+  "required": []
+}
