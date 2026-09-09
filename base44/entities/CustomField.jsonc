@@ -1,65 +1,62 @@
 {
   "name": "CustomField",
   "type": "object",
-  "description": "The field registry \u2014 the dictionary everything else references. Forms, surveys, webhook mappings and detail views all select from it. No feature invents its own field name.",
+  "description": "The field registry \u2014 the dictionary everything else references. Forms, surveys, webhook mappings and detail views all select from it. No feature invents its own field name. Schema matches the canonical Legenex registry export format so exports move between properties unchanged.",
   "properties": {
-    "canonical_name": {
+    "field_name": {
       "type": "string",
-      "description": "e.g. accident_state \u2014 matches a Lead property or a custom_fields key"
+      "description": "Canonical name, e.g. accident_state"
     },
     "label": {
       "type": "string"
     },
     "field_type": {
       "type": "string",
-      "enum": [
-        "text",
-        "textarea",
-        "number",
-        "boolean",
-        "select",
-        "multiselect",
-        "date",
-        "email",
-        "phone"
-      ],
-      "default": "text"
+      "description": "e.g. system, text, select, date, Calculated"
     },
-    "category": {
+    "source": {
       "type": "string",
-      "description": "e.g. contact, case, qualification, attribution"
+      "description": "e.g. inbound, calculated, hidden"
+    },
+    "sample_value": {
+      "type": "string"
+    },
+    "options": {
+      "type": "array",
+      "description": "Allowed values for select-style fields"
+    },
+    "include_in_leadbyte": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this field is included in the downstream buyer payload preset"
+    },
+    "leadbyte_field_name": {
+      "type": "string",
+      "description": "The field name the downstream system expects, if different from field_name"
+    },
+    "auto_created": {
+      "type": "boolean",
+      "default": false
+    },
+    "sort_order": {
+      "type": "number",
+      "default": 0
     },
     "required": {
       "type": "boolean",
       "default": false
     },
-    "options": {
-      "type": "array",
-      "description": "For select/multiselect: [{value,label}]"
-    },
-    "downstream_mapping_key": {
-      "type": "string",
-      "description": "The field name a downstream buyer/system expects for this value, if different from canonical_name"
-    },
-    "is_canonical": {
-      "type": "boolean",
-      "default": false,
-      "description": "True when this maps to a real Lead column rather than living in custom_fields"
+    "system_role": {
+      "type": "string"
     },
     "deprecated": {
       "type": "boolean",
-      "default": false
-    },
-    "deprecated_note": {
-      "type": "string"
-    },
-    "sort_order": {
-      "type": "number",
-      "default": 0
+      "default": false,
+      "description": "Renamed fields stay populated in parallel and are marked here rather than deleted, so a live pipeline never breaks for tidiness"
     }
   },
   "required": [
-    "canonical_name",
+    "field_name",
     "label"
   ]
 }
