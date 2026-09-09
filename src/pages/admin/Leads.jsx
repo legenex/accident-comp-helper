@@ -26,7 +26,6 @@ const ALL_COLUMNS = [
 ];
 const DEFAULT_VISIBLE = ['created_date', 'name', 'email', 'mobile', 'accident_state', 'qualification_status', 'source'];
 const COL_STORAGE_KEY = 'ach_admin_leads_columns';
-const VIEWS_STORAGE_KEY = 'ach_admin_leads_saved_views';
 const PAGE_SIZE = 25;
 
 const DETAIL_TABS = ['Overview', 'Contact', 'Case', 'Qualification', 'Attribution', 'Custom Fields', 'Calculated', 'Tracking', 'Deliveries'];
