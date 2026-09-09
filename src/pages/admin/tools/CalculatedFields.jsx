@@ -87,7 +87,7 @@ export default function CalculatedFields() {
     setEditing(null); load();
   };
   const duplicate = async (row) => {
-    const { id, ...rest } = row;
+    const { id: _id, ...rest } = row;
     await base44.entities.CalculatedField.create({ ...rest, token: `${row.token}_copy`, label: `${row.label} (copy)`, enabled: false });
     load();
   };
