@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { PageHeader, Panel, Button, TextInput, SelectInput, SearchInput, DataTable, StatusBadge, Modal, EmptyState } from '@/components/admin/ui';
+import { PageHeader, Panel, Button, TextInput, SelectInput, SearchInput, DataTable, Modal, EmptyState } from '@/components/admin/ui';
 import { base44 } from '@/api/base44Client';
 import { UserPlus, Users2, Mail } from 'lucide-react';
 import { ROLES, normalizeRole } from '@/lib/admin-nav';
