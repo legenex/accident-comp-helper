@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Card, Pill, AdminButton, SearchBar, Select, EmptyState, Modal } from "@/components/admin/ui";
+import { Card, LegacyPill, AdminButton, SearchBar, LegacySelect, LegacyEmptyState, LegacyModal } from "@/components/admin/ui";
 import { base44 } from "@/api/base44Client";
 import { Plus, Eye, Edit, Trash2, Copy, ExternalLink, ToggleLeft, ToggleRight, Sparkles, Beaker } from "lucide-react";
 
@@ -103,9 +103,9 @@ export default function Experiments() {
 
       <Card className="mb-6 flex flex-wrap items-center gap-3">
         <SearchBar value={search} onChange={setSearch} placeholder="Search by title or slug..." />
-        <Select value={statusFilter} onChange={setStatusFilter} options={["All", "published", "draft", "archived"]} />
-        <Select value={buildFilter} onChange={setBuildFilter} options={["All", "planned", "in_progress", "beta", "live"]} />
-        <Select value={categoryFilter} onChange={setCategoryFilter} options={["All", "Estimator", "Ticker", "Analyzer", "Map", "Generator", "Countdown", "Predictor", "Simulator", "Community", "Calculator", "Other"]} />
+        <LegacySelect value={statusFilter} onChange={setStatusFilter} options={["All", "published", "draft", "archived"]} />
+        <LegacySelect value={buildFilter} onChange={setBuildFilter} options={["All", "planned", "in_progress", "beta", "live"]} />
+        <LegacySelect value={categoryFilter} onChange={setCategoryFilter} options={["All", "Estimator", "Ticker", "Analyzer", "Map", "Generator", "Countdown", "Predictor", "Simulator", "Community", "Calculator", "Other"]} />
       </Card>
 
       <Card className="overflow-x-auto p-0">
@@ -114,7 +114,7 @@ export default function Experiments() {
             {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-12 animate-pulse rounded bg-white/5" />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="p-5"><EmptyState icon={Beaker} title="No experiments yet" body="Create your first experiment or generate one with AI." action={<Link to="/admin/experiments/new"><AdminButton><Plus className="h-4 w-4" /> New Experiment</AdminButton></Link>} /></div>
+          <div className="p-5"><LegacyEmptyState icon={Beaker} title="No experiments yet" body="Create your first experiment or generate one with AI." action={<Link to="/admin/experiments/new"><AdminButton><Plus className="h-4 w-4" /> New Experiment</AdminButton></Link>} /></div>
         ) : (
           <table className="w-full text-sm">
             <thead>
@@ -140,8 +140,8 @@ export default function Experiments() {
                     {e.hero_headline && <div className="text-xs text-admuted">{e.hero_headline}</div>}
                   </td>
                   <td className="hidden p-3 font-mono text-xs text-brand md:table-cell">{e.path}</td>
-                  <td className="p-3"><Pill tone={STATUS_TONE[e.status]}>{e.status}</Pill></td>
-                  <td className="hidden p-3 lg:table-cell"><Pill tone={BUILD_TONE[e.build_status]}>{e.build_status}</Pill></td>
+                  <td className="p-3"><LegacyPill tone={STATUS_TONE[e.status]}>{e.status}</LegacyPill></td>
+                  <td className="hidden p-3 lg:table-cell"><LegacyPill tone={BUILD_TONE[e.build_status]}>{e.build_status}</LegacyPill></td>
                   <td className="p-3 text-right text-white">{e.view_count || 0}</td>
                   <td className="hidden p-3 text-right text-slate-300 sm:table-cell">{e.clicks || 0}</td>
                   <td className="hidden p-3 text-right text-slate-300 sm:table-cell">{ctr(e)}</td>
@@ -162,22 +162,22 @@ export default function Experiments() {
         )}
       </Card>
 
-      <Modal open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete experiment?">
+      <LegacyModal open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete experiment?">
         <p className="text-sm text-slate-300">Are you sure you want to delete "{deleteConfirm?.title}"? This cannot be undone.</p>
         <div className="mt-6 flex justify-end gap-3">
           <AdminButton variant="secondary" onClick={() => setDeleteConfirm(null)}>Cancel</AdminButton>
           <AdminButton variant="danger" onClick={() => remove(deleteConfirm.id)}><Trash2 className="h-4 w-4" /> Delete</AdminButton>
         </div>
-      </Modal>
+      </LegacyModal>
 
-      <Modal open={aiModal} onClose={() => setAiModal(false)} title="Generate with AI" wide>
+      <LegacyModal open={aiModal} onClose={() => setAiModal(false)} title="Generate with AI" wide>
         <p className="text-sm text-slate-300">Describe the experiment you want to create. AI will draft the headline, path, and copy for you.</p>
         <textarea rows={4} value={aiPrompt} onChange={(e) => setAiPrompt(e.target.value)} placeholder="e.g. A tool that estimates what a rear-end collision claim might be worth" className="mt-4 w-full rounded-lg border border-navyline bg-navy/60 px-3 py-2 text-sm text-white placeholder-admuted/60 outline-none focus:border-brand" />
         <div className="mt-6 flex justify-end gap-3">
           <AdminButton variant="secondary" onClick={() => setAiModal(false)}>Cancel</AdminButton>
           <AdminButton variant="purple" onClick={generateAI} disabled={aiGenerating}>{aiGenerating ? "Generating..." : <><Sparkles className="h-4 w-4" /> Generate</>}</AdminButton>
         </div>
-      </Modal>
+      </LegacyModal>
     </AdminLayout>
   );
 }

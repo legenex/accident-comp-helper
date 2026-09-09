@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Card, Pill, AdminButton, SearchBar, EmptyState, Modal, Field, AdminInput } from "@/components/admin/ui";
+import { Card, LegacyPill, AdminButton, SearchBar, LegacyEmptyState, LegacyModal, Field, AdminInput } from "@/components/admin/ui";
 import { base44 } from "@/api/base44Client";
 import { UserPlus, Users, Mail } from "lucide-react";
 
@@ -45,7 +45,7 @@ export default function UserManagement() {
         {loading ? (
           <div className="space-y-2 p-5">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-12 animate-pulse rounded bg-white/5" />)}</div>
         ) : filtered.length === 0 ? (
-          <div className="p-5"><EmptyState icon={Users} title="No users found" body="Invite team members to collaborate." action={<AdminButton onClick={() => setInviteOpen(true)}><UserPlus className="h-4 w-4" /> Invite User</AdminButton>} /></div>
+          <div className="p-5"><LegacyEmptyState icon={Users} title="No users found" body="Invite team members to collaborate." action={<AdminButton onClick={() => setInviteOpen(true)}><UserPlus className="h-4 w-4" /> Invite User</AdminButton>} /></div>
         ) : (
           <table className="w-full text-sm">
             <thead><tr className="border-b border-white/10 text-admuted">
@@ -59,7 +59,7 @@ export default function UserManagement() {
                 <tr key={u.id} className="border-b border-white/5 hover:bg-white/5">
                   <td className="p-3 font-semibold text-white">{u.full_name || "-"}</td>
                   <td className="p-3 text-slate-300">{u.email}</td>
-                  <td className="p-3"><Pill tone={u.role === "admin" ? "blue" : "neutral"}>{u.role || "user"}</Pill></td>
+                  <td className="p-3"><LegacyPill tone={u.role === "admin" ? "blue" : "neutral"}>{u.role || "user"}</LegacyPill></td>
                   <td className="hidden p-3 text-slate-300 sm:table-cell">{u.created_date ? new Date(u.created_date).toLocaleDateString("en-US") : "-"}</td>
                 </tr>
               ))}
@@ -68,7 +68,7 @@ export default function UserManagement() {
         )}
       </Card>
 
-      <Modal open={inviteOpen} onClose={() => setInviteOpen(false)} title="Invite User">
+      <LegacyModal open={inviteOpen} onClose={() => setInviteOpen(false)} title="Invite User">
         <div className="space-y-4">
           <Field label="Email address"><AdminInput type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="teammate@example.com" /></Field>
           <Field label="Role">
@@ -79,7 +79,7 @@ export default function UserManagement() {
           {error && <p className="text-sm text-destructive">{error}</p>}
           <div className="flex justify-end gap-3 pt-2"><AdminButton variant="secondary" onClick={() => setInviteOpen(false)}>Cancel</AdminButton><AdminButton onClick={invite} disabled={inviting || !inviteEmail}><Mail className="h-4 w-4" /> {inviting ? "Sending..." : "Send invite"}</AdminButton></div>
         </div>
-      </Modal>
+      </LegacyModal>
     </AdminLayout>
   );
 }

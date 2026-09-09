@@ -1,6 +1,6 @@
 import React from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Card, Pill, AdminButton } from "@/components/admin/ui";
+import { Card, LegacyPill, AdminButton } from "@/components/admin/ui";
 import { BarChart2, Search, Facebook, Slack, Puzzle, RefreshCw } from "lucide-react";
 
 const integrations = [
@@ -21,7 +21,7 @@ export default function Integrations() {
             <div className="flex-1">
               <div className="flex items-center justify-between">
                 <h3 className="font-heading text-base font-bold text-white">{i.name}</h3>
-                <Pill tone={i.connected ? "success" : "neutral"}>{i.connected ? "Connected" : "Disconnected"}</Pill>
+                <LegacyPill tone={i.connected ? "success" : "neutral"}>{i.connected ? "Connected" : "Disconnected"}</LegacyPill>
               </div>
               <p className="mt-1.5 text-sm text-admuted">{i.desc}</p>
               <div className="mt-3 flex items-center gap-2">

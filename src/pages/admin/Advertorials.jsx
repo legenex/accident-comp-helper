@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Card, Pill, AdminButton, SearchBar, Select, EmptyState, Modal, Field, AdminInput } from "@/components/admin/ui";
+import { Card, LegacyPill, AdminButton, SearchBar, LegacySelect, LegacyEmptyState, LegacyModal, Field, AdminInput } from "@/components/admin/ui";
 import { base44 } from "@/api/base44Client";
 import { Plus, Edit, Trash2, ExternalLink, Newspaper, ToggleLeft, ToggleRight } from "lucide-react";
 
@@ -64,14 +64,14 @@ export default function Advertorials() {
 
       <Card className="mb-6 flex flex-wrap items-center gap-3">
         <SearchBar value={search} onChange={setSearch} placeholder="Search by title or slug..." />
-        <Select value={statusFilter} onChange={setStatusFilter} options={["All", "published", "draft", "archived"]} />
+        <LegacySelect value={statusFilter} onChange={setStatusFilter} options={["All", "published", "draft", "archived"]} />
       </Card>
 
       <Card className="overflow-x-auto p-0">
         {loading ? (
           <div className="space-y-2 p-5">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-12 animate-pulse rounded bg-white/5" />)}</div>
         ) : filtered.length === 0 ? (
-          <div className="p-5"><EmptyState icon={Newspaper} title="No advertorials yet" body="Create your first advertorial to start driving leads." action={<AdminButton onClick={() => setEditing({ ...blank })}><Plus className="h-4 w-4" /> New Advertorial</AdminButton>} /></div>
+          <div className="p-5"><LegacyEmptyState icon={Newspaper} title="No advertorials yet" body="Create your first advertorial to start driving leads." action={<AdminButton onClick={() => setEditing({ ...blank })}><Plus className="h-4 w-4" /> New Advertorial</AdminButton>} /></div>
         ) : (
           <table className="w-full text-sm">
             <thead>
@@ -94,7 +94,7 @@ export default function Advertorials() {
                     {a.headline && <div className="text-xs text-admuted">{a.headline}</div>}
                   </td>
                   <td className="hidden p-3 font-mono text-xs text-brand lg:table-cell">/a/{a.slug}</td>
-                  <td className="p-3"><Pill tone={a.status === "published" ? "success" : "neutral"}>{a.status}</Pill></td>
+                  <td className="p-3"><LegacyPill tone={a.status === "published" ? "success" : "neutral"}>{a.status}</LegacyPill></td>
                   <td className="p-3 text-right text-white">{a.views || 0}</td>
                   <td className="hidden p-3 text-right text-slate-300 sm:table-cell">{a.clicks || 0}</td>
                   <td className="hidden p-3 text-right text-slate-300 sm:table-cell">{ctr(a)}</td>
@@ -114,7 +114,7 @@ export default function Advertorials() {
         )}
       </Card>
 
-      <Modal open={!!editing} onClose={() => setEditing(null)} title={editing?.id ? "Edit Advertorial" : "New Advertorial"} wide>
+      <LegacyModal open={!!editing} onClose={() => setEditing(null)} title={editing?.id ? "Edit Advertorial" : "New Advertorial"} wide>
         {editing && (
           <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
             <Field label="Title"><AdminInput value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} /></Field>
@@ -139,15 +139,15 @@ export default function Advertorials() {
             </div>
           </div>
         )}
-      </Modal>
+      </LegacyModal>
 
-      <Modal open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete advertorial?">
+      <LegacyModal open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete advertorial?">
         <p className="text-sm text-slate-300">Delete "{deleteConfirm?.title}"? This cannot be undone.</p>
         <div className="mt-6 flex justify-end gap-3">
           <AdminButton variant="secondary" onClick={() => setDeleteConfirm(null)}>Cancel</AdminButton>
           <AdminButton variant="danger" onClick={() => remove(deleteConfirm.id)}><Trash2 className="h-4 w-4" /> Delete</AdminButton>
         </div>
-      </Modal>
+      </LegacyModal>
     </AdminLayout>
   );
 }

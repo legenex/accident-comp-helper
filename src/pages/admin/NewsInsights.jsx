@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Card, Pill, AdminButton, SearchBar, Select, EmptyState, Modal, Field, AdminInput } from "@/components/admin/ui";
+import { Card, LegacyPill, AdminButton, SearchBar, LegacySelect, LegacyEmptyState, LegacyModal, Field, AdminInput } from "@/components/admin/ui";
 import { base44 } from "@/api/base44Client";
 import { Plus, Edit, Trash2, Radar } from "lucide-react";
 
@@ -43,13 +43,13 @@ export default function Signals() {
       </div>
       <Card className="mb-6 flex flex-wrap items-center gap-3">
         <SearchBar value={search} onChange={setSearch} placeholder="Search by title or source..." />
-        <Select value={statusFilter} onChange={setStatusFilter} options={["All", "new", "reviewing", "promoted", "archived"]} />
+        <LegacySelect value={statusFilter} onChange={setStatusFilter} options={["All", "new", "reviewing", "promoted", "archived"]} />
       </Card>
       <Card className="overflow-x-auto p-0">
         {loading ? (
           <div className="space-y-2 p-5">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-12 animate-pulse rounded bg-white/5" />)}</div>
         ) : filtered.length === 0 ? (
-          <div className="p-5"><EmptyState icon={Radar} title="No signals yet" body="Capture trending topics and search signals." action={<AdminButton onClick={() => setEditing({ ...blank })}><Plus className="h-4 w-4" /> New Signal</AdminButton>} /></div>
+          <div className="p-5"><LegacyEmptyState icon={Radar} title="No signals yet" body="Capture trending topics and search signals." action={<AdminButton onClick={() => setEditing({ ...blank })}><Plus className="h-4 w-4" /> New Signal</AdminButton>} /></div>
         ) : (
           <table className="w-full text-sm">
             <thead><tr className="border-b border-white/10 text-admuted">
@@ -66,7 +66,7 @@ export default function Signals() {
                   <td className="p-3"><button onClick={() => setEditing(s)} className="font-semibold text-white hover:text-brand">{s.title}</button>{s.summary && <div className="text-xs text-admuted">{s.summary}</div>}</td>
                   <td className="hidden p-3 text-slate-300 sm:table-cell">{s.source || "-"}</td>
                   <td className="hidden p-3 text-slate-300 lg:table-cell">{s.category || "-"}</td>
-                  <td className="p-3"><Pill tone={STATUS_TONE[s.status]}>{s.status}</Pill></td>
+                  <td className="p-3"><LegacyPill tone={STATUS_TONE[s.status]}>{s.status}</LegacyPill></td>
                   <td className="p-3 text-right text-white">{s.score || 0}</td>
                   <td className="p-3"><div className="flex items-center justify-end gap-1.5">
                     <button onClick={() => setEditing(s)} className="rounded p-1.5 text-admuted hover:bg-white/10 hover:text-white"><Edit className="h-4 w-4" /></button>
@@ -79,7 +79,7 @@ export default function Signals() {
         )}
       </Card>
 
-      <Modal open={!!editing} onClose={() => setEditing(null)} title={editing?.id ? "Edit Signal" : "New Signal"} wide>
+      <LegacyModal open={!!editing} onClose={() => setEditing(null)} title={editing?.id ? "Edit Signal" : "New Signal"} wide>
         {editing && (
           <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
             <Field label="Title"><AdminInput value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} /></Field>
@@ -95,11 +95,11 @@ export default function Signals() {
             <div className="flex justify-end gap-3 pt-2"><AdminButton variant="secondary" onClick={() => setEditing(null)}>Cancel</AdminButton><AdminButton onClick={save}>Save</AdminButton></div>
           </div>
         )}
-      </Modal>
-      <Modal open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete signal?">
+      </LegacyModal>
+      <LegacyModal open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete signal?">
         <p className="text-sm text-slate-300">Delete "{deleteConfirm?.title}"? This cannot be undone.</p>
         <div className="mt-6 flex justify-end gap-3"><AdminButton variant="secondary" onClick={() => setDeleteConfirm(null)}>Cancel</AdminButton><AdminButton variant="danger" onClick={() => remove(deleteConfirm.id)}><Trash2 className="h-4 w-4" /> Delete</AdminButton></div>
-      </Modal>
+      </LegacyModal>
     </AdminLayout>
   );
 }

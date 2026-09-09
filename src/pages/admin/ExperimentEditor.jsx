@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Card, AdminButton, AdminInput, Field, Pill } from "@/components/admin/ui";
+import { Card, AdminButton, AdminInput, Field, LegacyPill } from "@/components/admin/ui";
 import { base44 } from "@/api/base44Client";
 import { ArrowLeft, Save } from "lucide-react";
 
@@ -61,7 +61,7 @@ export default function ExperimentEditor() {
       <div className="mb-6 flex items-center justify-between">
         <Link to="/admin/experiments" className="inline-flex items-center gap-2 text-sm text-admuted hover:text-white"><ArrowLeft className="h-4 w-4" /> Back to experiments</Link>
         <div className="flex items-center gap-3">
-          <Pill tone={form.status === "published" ? "success" : "neutral"}>{form.status}</Pill>
+          <LegacyPill tone={form.status === "published" ? "success" : "neutral"}>{form.status}</LegacyPill>
           <AdminButton onClick={save} disabled={saving}><Save className="h-4 w-4" /> {saving ? "Saving..." : "Save"}</AdminButton>
         </div>
       </div>

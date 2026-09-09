@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Card, Pill, AdminButton, SearchBar, EmptyState, Modal, Field, AdminInput } from "@/components/admin/ui";
+import { Card, LegacyPill, AdminButton, SearchBar, LegacyEmptyState, LegacyModal, Field, AdminInput } from "@/components/admin/ui";
 import { base44 } from "@/api/base44Client";
 import { Plus, Edit, Trash2, Palette, Copy } from "lucide-react";
 
@@ -49,14 +49,14 @@ export default function Themes() {
       {loading ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-40 animate-pulse rounded-xl bg-white/5" />)}</div>
       ) : filtered.length === 0 ? (
-        <EmptyState icon={Palette} title="No themes yet" body="Create a theme to style your public pages." action={<AdminButton onClick={() => setEditing({ ...blank })}><Plus className="h-4 w-4" /> New Theme</AdminButton>} />
+        <LegacyEmptyState icon={Palette} title="No themes yet" body="Create a theme to style your public pages." action={<AdminButton onClick={() => setEditing({ ...blank })}><Plus className="h-4 w-4" /> New Theme</AdminButton>} />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((t) => (
             <Card key={t.id} className="flex flex-col">
               <div className="mb-3 flex items-center justify-between">
                 <h3 className="font-heading text-base font-bold text-white">{t.name}</h3>
-                <Pill tone={t.status === "active" ? "success" : "neutral"}>{t.status}</Pill>
+                <LegacyPill tone={t.status === "active" ? "success" : "neutral"}>{t.status}</LegacyPill>
               </div>
               <p className="flex-1 text-sm text-admuted">{t.description || "No description."}</p>
               <div className="mt-4 flex items-center gap-2">
@@ -77,7 +77,7 @@ export default function Themes() {
         </div>
       )}
 
-      <Modal open={!!editing} onClose={() => setEditing(null)} title={editing?.id ? "Edit Theme" : "New Theme"} wide>
+      <LegacyModal open={!!editing} onClose={() => setEditing(null)} title={editing?.id ? "Edit Theme" : "New Theme"} wide>
         {editing && (
           <div className="space-y-4">
             <Field label="Name"><AdminInput value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} /></Field>
@@ -89,11 +89,11 @@ export default function Themes() {
             <div className="flex justify-end gap-3 pt-2"><AdminButton variant="secondary" onClick={() => setEditing(null)}>Cancel</AdminButton><AdminButton onClick={save}>Save</AdminButton></div>
           </div>
         )}
-      </Modal>
-      <Modal open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete theme?">
+      </LegacyModal>
+      <LegacyModal open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete theme?">
         <p className="text-sm text-slate-300">Delete "{deleteConfirm?.name}"? This cannot be undone.</p>
         <div className="mt-6 flex justify-end gap-3"><AdminButton variant="secondary" onClick={() => setDeleteConfirm(null)}>Cancel</AdminButton><AdminButton variant="danger" onClick={() => remove(deleteConfirm.id)}><Trash2 className="h-4 w-4" /> Delete</AdminButton></div>
-      </Modal>
+      </LegacyModal>
     </AdminLayout>
   );
 }

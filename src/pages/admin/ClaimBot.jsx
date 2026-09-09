@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Card, AdminButton, Field, AdminInput, Pill } from "@/components/admin/ui";
+import { Card, AdminButton, Field, AdminInput, LegacyPill } from "@/components/admin/ui";
 import { Bot, Save, MessageSquare, Sparkles } from "lucide-react";
 
 export default function ClaimBot() {
@@ -20,7 +20,7 @@ export default function ClaimBot() {
     <AdminLayout title="ClaimBot" breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "ClaimBot" }]}>
       <div className="mb-6 flex items-center justify-between">
         <div><h2 className="text-2xl font-bold text-white">ClaimBot</h2><p className="mt-1 text-sm text-admuted">Configure your site assistant</p></div>
-        <div className="flex items-center gap-3"><Pill tone={config.enabled ? "success" : "neutral"}>{config.enabled ? "Active" : "Disabled"}</Pill></div>
+        <div className="flex items-center gap-3"><LegacyPill tone={config.enabled ? "success" : "neutral"}>{config.enabled ? "Active" : "Disabled"}</LegacyPill></div>
       </div>
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">

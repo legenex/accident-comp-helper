@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Card, Pill, AdminButton, SearchBar, EmptyState, Modal, Field, AdminInput } from "@/components/admin/ui";
+import { Card, LegacyPill, AdminButton, SearchBar, LegacyEmptyState, LegacyModal, Field, AdminInput } from "@/components/admin/ui";
 import { base44 } from "@/api/base44Client";
 import { Plus, Edit, Trash2, Search } from "lucide-react";
 
@@ -40,7 +40,7 @@ export default function SEO() {
         {loading ? (
           <div className="space-y-2 p-5">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-12 animate-pulse rounded bg-white/5" />)}</div>
         ) : filtered.length === 0 ? (
-          <div className="p-5"><EmptyState icon={Search} title="No SEO entries yet" body="Add meta data for your pages." action={<AdminButton onClick={() => setEditing({ ...blank })}><Plus className="h-4 w-4" /> New Entry</AdminButton>} /></div>
+          <div className="p-5"><LegacyEmptyState icon={Search} title="No SEO entries yet" body="Add meta data for your pages." action={<AdminButton onClick={() => setEditing({ ...blank })}><Plus className="h-4 w-4" /> New Entry</AdminButton>} /></div>
         ) : (
           <table className="w-full text-sm">
             <thead><tr className="border-b border-white/10 text-admuted">
@@ -56,7 +56,7 @@ export default function SEO() {
                   <td className="p-3 font-mono text-xs text-brand">{r.page_path}</td>
                   <td className="p-3"><button onClick={() => setEditing(r)} className="font-semibold text-white hover:text-brand">{r.title || "-"}</button></td>
                   <td className="hidden p-3 text-slate-300 lg:table-cell">{r.keywords || "-"}</td>
-                  <td className="p-3"><Pill tone={r.indexable ? "success" : "neutral"}>{r.indexable ? "index" : "noindex"}</Pill></td>
+                  <td className="p-3"><LegacyPill tone={r.indexable ? "success" : "neutral"}>{r.indexable ? "index" : "noindex"}</LegacyPill></td>
                   <td className="p-3"><div className="flex items-center justify-end gap-1.5">
                     <button onClick={() => setEditing(r)} className="rounded p-1.5 text-admuted hover:bg-white/10 hover:text-white"><Edit className="h-4 w-4" /></button>
                     <button onClick={() => setDeleteConfirm(r)} className="rounded p-1.5 text-admuted hover:bg-white/10 hover:text-destructive"><Trash2 className="h-4 w-4" /></button>
@@ -68,7 +68,7 @@ export default function SEO() {
         )}
       </Card>
 
-      <Modal open={!!editing} onClose={() => setEditing(null)} title={editing?.id ? "Edit SEO Entry" : "New SEO Entry"} wide>
+      <LegacyModal open={!!editing} onClose={() => setEditing(null)} title={editing?.id ? "Edit SEO Entry" : "New SEO Entry"} wide>
         {editing && (
           <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
             <Field label="Page path"><AdminInput value={editing.page_path} onChange={(e) => setEditing({ ...editing, page_path: e.target.value })} placeholder="/" /></Field>
@@ -84,11 +84,11 @@ export default function SEO() {
             <div className="flex justify-end gap-3 pt-2"><AdminButton variant="secondary" onClick={() => setEditing(null)}>Cancel</AdminButton><AdminButton onClick={save}>Save</AdminButton></div>
           </div>
         )}
-      </Modal>
-      <Modal open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete entry?">
+      </LegacyModal>
+      <LegacyModal open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete entry?">
         <p className="text-sm text-slate-300">Delete "{deleteConfirm?.page_path}"? This cannot be undone.</p>
         <div className="mt-6 flex justify-end gap-3"><AdminButton variant="secondary" onClick={() => setDeleteConfirm(null)}>Cancel</AdminButton><AdminButton variant="danger" onClick={() => remove(deleteConfirm.id)}><Trash2 className="h-4 w-4" /> Delete</AdminButton></div>
-      </Modal>
+      </LegacyModal>
     </AdminLayout>
   );
 }

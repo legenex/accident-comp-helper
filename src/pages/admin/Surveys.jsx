@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { Card, Pill, AdminButton, SearchBar, Select, EmptyState, Modal, Field, AdminInput } from "@/components/admin/ui";
+import { Card, LegacyPill, AdminButton, SearchBar, LegacySelect, LegacyEmptyState, LegacyModal, Field, AdminInput } from "@/components/admin/ui";
 import { base44 } from "@/api/base44Client";
 import { Plus, Edit, Trash2, ListChecks, Copy, ExternalLink } from "lucide-react";
 
@@ -57,14 +57,14 @@ export default function Surveys() {
 
       <Card className="mb-6 flex flex-wrap items-center gap-3">
         <SearchBar value={search} onChange={setSearch} placeholder="Search by title or slug..." />
-        <Select value={statusFilter} onChange={setStatusFilter} options={["All", "published", "draft", "archived"]} />
+        <LegacySelect value={statusFilter} onChange={setStatusFilter} options={["All", "published", "draft", "archived"]} />
       </Card>
 
       <Card className="overflow-x-auto p-0">
         {loading ? (
           <div className="space-y-2 p-5">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-12 animate-pulse rounded bg-white/5" />)}</div>
         ) : filtered.length === 0 ? (
-          <div className="p-5"><EmptyState icon={ListChecks} title="No surveys yet" body="Create your first survey to start collecting responses." action={<AdminButton onClick={() => setEditing({ ...blank })}><Plus className="h-4 w-4" /> New Survey</AdminButton>} /></div>
+          <div className="p-5"><LegacyEmptyState icon={ListChecks} title="No surveys yet" body="Create your first survey to start collecting responses." action={<AdminButton onClick={() => setEditing({ ...blank })}><Plus className="h-4 w-4" /> New Survey</AdminButton>} /></div>
         ) : (
           <table className="w-full text-sm">
             <thead>
@@ -86,7 +86,7 @@ export default function Surveys() {
                     {s.description && <div className="text-xs text-admuted">{s.description}</div>}
                   </td>
                   <td className="hidden p-3 font-mono text-xs text-brand lg:table-cell">/s/{s.slug}</td>
-                  <td className="p-3"><Pill tone={s.status === "published" ? "success" : "neutral"}>{s.status}</Pill></td>
+                  <td className="p-3"><LegacyPill tone={s.status === "published" ? "success" : "neutral"}>{s.status}</LegacyPill></td>
                   <td className="hidden p-3 text-right text-slate-300 sm:table-cell">{(s.questions || []).length}</td>
                   <td className="p-3 text-right text-white">{s.responses || 0}</td>
                   <td className="hidden p-3 text-right text-slate-300 sm:table-cell">{s.completion_rate || 0}%</td>
@@ -105,7 +105,7 @@ export default function Surveys() {
         )}
       </Card>
 
-      <Modal open={!!editing} onClose={() => setEditing(null)} title={editing?.id ? "Edit Survey" : "New Survey"} wide>
+      <LegacyModal open={!!editing} onClose={() => setEditing(null)} title={editing?.id ? "Edit Survey" : "New Survey"} wide>
         {editing && (
           <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
             <Field label="Title"><AdminInput value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} /></Field>
@@ -127,15 +127,15 @@ export default function Surveys() {
             </div>
           </div>
         )}
-      </Modal>
+      </LegacyModal>
 
-      <Modal open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete survey?">
+      <LegacyModal open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete survey?">
         <p className="text-sm text-slate-300">Delete "{deleteConfirm?.title}"? This cannot be undone.</p>
         <div className="mt-6 flex justify-end gap-3">
           <AdminButton variant="secondary" onClick={() => setDeleteConfirm(null)}>Cancel</AdminButton>
           <AdminButton variant="danger" onClick={() => remove(deleteConfirm.id)}><Trash2 className="h-4 w-4" /> Delete</AdminButton>
         </div>
-      </Modal>
+      </LegacyModal>
     </AdminLayout>
   );
 }
