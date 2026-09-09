@@ -1,18 +1,19 @@
-import React, { useState, useEffect } from "react";
-import AdminLayout from "@/components/admin/AdminLayout";
-import { Card, LegacyPill, AdminButton, SearchBar, LegacyEmptyState, LegacyModal, Field, AdminInput } from "@/components/admin/ui";
-import { base44 } from "@/api/base44Client";
-import { UserPlus, Users, Mail } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import AdminLayout from '@/components/admin/AdminLayout';
+import { PageHeader, Panel, Button, TextInput, SelectInput, SearchInput, DataTable, StatusBadge, Modal, EmptyState } from '@/components/admin/ui';
+import { base44 } from '@/api/base44Client';
+import { UserPlus, Users2, Mail } from 'lucide-react';
+import { ROLES, normalizeRole } from '@/lib/admin-nav';
 
-export default function UserManagement() {
+export default function UsersSettings() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [inviteOpen, setInviteOpen] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteRole, setInviteRole] = useState("user");
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState('editor');
   const [inviting, setInviting] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
 
   const fetchUsers = async () => {
     setLoading(true);
@@ -22,64 +23,71 @@ export default function UserManagement() {
   useEffect(() => { fetchUsers(); }, []);
 
   const filtered = users.filter((u) => !search || u.email?.toLowerCase().includes(search.toLowerCase()) || u.full_name?.toLowerCase().includes(search.toLowerCase()));
+  const ownerCount = users.filter((u) => normalizeRole(u.role) === 'owner').length;
 
   const invite = async () => {
-    setInviting(true); setError("");
+    setInviting(true); setError('');
     try {
       await base44.users.inviteUser(inviteEmail, inviteRole);
-      setInviteOpen(false); setInviteEmail(""); setInviteRole("user");
+      setInviteOpen(false); setInviteEmail(''); setInviteRole('editor');
       fetchUsers();
     } catch (e) {
-      setError(e?.message || "Could not send invite. You may need admin permissions.");
+      setError(e?.message || 'Could not send invite. You may need admin permissions.');
     } finally { setInviting(false); }
   };
 
-  return (
-    <AdminLayout title="User Management" breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "User Management" }]}>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div><h2 className="text-2xl font-bold text-white">User Management</h2><p className="mt-1 text-sm text-admuted">{users.length} users</p></div>
-        <AdminButton onClick={() => setInviteOpen(true)}><UserPlus className="h-4 w-4" /> Invite User</AdminButton>
-      </div>
-      <Card className="mb-6"><SearchBar value={search} onChange={setSearch} placeholder="Search by name or email..." /></Card>
-      <Card className="overflow-x-auto p-0">
-        {loading ? (
-          <div className="space-y-2 p-5">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-12 animate-pulse rounded bg-white/5" />)}</div>
-        ) : filtered.length === 0 ? (
-          <div className="p-5"><LegacyEmptyState icon={Users} title="No users found" body="Invite team members to collaborate." action={<AdminButton onClick={() => setInviteOpen(true)}><UserPlus className="h-4 w-4" /> Invite User</AdminButton>} /></div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead><tr className="border-b border-white/10 text-admuted">
-              <th className="p-3 text-left font-medium">Name</th>
-              <th className="p-3 text-left font-medium">Email</th>
-              <th className="p-3 text-left font-medium">Role</th>
-              <th className="hidden p-3 text-left font-medium sm:table-cell">Joined</th>
-            </tr></thead>
-            <tbody>
-              {filtered.map((u) => (
-                <tr key={u.id} className="border-b border-white/5 hover:bg-white/5">
-                  <td className="p-3 font-semibold text-white">{u.full_name || "-"}</td>
-                  <td className="p-3 text-slate-300">{u.email}</td>
-                  <td className="p-3"><LegacyPill tone={u.role === "admin" ? "blue" : "neutral"}>{u.role || "user"}</LegacyPill></td>
-                  <td className="hidden p-3 text-slate-300 sm:table-cell">{u.created_date ? new Date(u.created_date).toLocaleDateString("en-US") : "-"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </Card>
+  const changeRole = async (user, nextRole) => {
+    await base44.entities.User.update(user.id, { role: nextRole });
+    fetchUsers();
+  };
 
-      <LegacyModal open={inviteOpen} onClose={() => setInviteOpen(false)} title="Invite User">
+  return (
+    <AdminLayout>
+      <PageHeader title="Users" description="Roles and access. The last remaining owner can't be demoted."
+        actions={<Button variant="gold" icon={UserPlus} onClick={() => setInviteOpen(true)}>Invite user</Button>} />
+
+      <Panel padded={false}>
+        <div className="p-4"><SearchInput value={search} onChange={setSearch} placeholder="Search by name or email..." /></div>
+        <DataTable
+          loading={loading} rows={filtered}
+          empty={<div className="p-4"><EmptyState icon={Users2} title="No users found" description="Invite team members to collaborate." action={<Button variant="gold" icon={UserPlus} onClick={() => setInviteOpen(true)}>Invite user</Button>} /></div>}
+          columns={[
+            { key: 'full_name', header: 'Name' },
+            { key: 'email', header: 'Email' },
+            {
+              key: 'role', header: 'Role',
+              render: (u) => {
+                const role = normalizeRole(u.role);
+                const isLastOwner = role === 'owner' && ownerCount <= 1;
+                return (
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <select
+                      value={role}
+                      disabled={isLastOwner}
+                      title={isLastOwner ? "The last remaining owner can't be demoted" : undefined}
+                      onChange={(e) => changeRole(u, e.target.value)}
+                      className="rounded px-2 py-1 text-sm"
+                      style={{ background: '#122430', color: '#E8F1EF', border: '1px solid rgba(148,180,190,0.26)', opacity: isLastOwner ? 0.5 : 1, cursor: isLastOwner ? 'not-allowed' : 'pointer' }}
+                    >
+                      {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+                    </select>
+                  </div>
+                );
+              },
+            },
+            { key: 'created_date', header: 'Joined', render: (u) => u.created_date ? new Date(u.created_date).toLocaleDateString() : null },
+          ]}
+        />
+      </Panel>
+
+      <Modal open={inviteOpen} onClose={() => setInviteOpen(false)} title="Invite user"
+        footer={<><Button variant="secondary" onClick={() => setInviteOpen(false)}>Cancel</Button><Button variant="gold" icon={Mail} loading={inviting} disabled={!inviteEmail} onClick={invite}>Send invite</Button></>}>
         <div className="space-y-4">
-          <Field label="Email address"><AdminInput type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="teammate@example.com" /></Field>
-          <Field label="Role">
-            <select value={inviteRole} onChange={(e) => setInviteRole(e.target.value)} className="w-full rounded-lg border border-navyline bg-navy/60 px-3 py-2 text-sm text-white outline-none focus:border-brand">
-              <option value="user">user</option><option value="admin">admin</option>
-            </select>
-          </Field>
-          {error && <p className="text-sm text-destructive">{error}</p>}
-          <div className="flex justify-end gap-3 pt-2"><AdminButton variant="secondary" onClick={() => setInviteOpen(false)}>Cancel</AdminButton><AdminButton onClick={invite} disabled={inviting || !inviteEmail}><Mail className="h-4 w-4" /> {inviting ? "Sending..." : "Send invite"}</AdminButton></div>
+          <TextInput label="Email address" type="email" value={inviteEmail} onChange={(e) => setInviteEmail(e.target.value)} placeholder="teammate@example.com" />
+          <SelectInput label="Role" value={inviteRole} options={ROLES} onChange={(e) => setInviteRole(e.target.value)} />
+          {error && <p className="text-sm" style={{ color: '#E5534B' }}>{error}</p>}
         </div>
-      </LegacyModal>
+      </Modal>
     </AdminLayout>
   );
 }
