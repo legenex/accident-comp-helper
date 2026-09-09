@@ -1,26 +1,25 @@
 {
   "name": "CalculatedField",
   "type": "object",
-  "description": "Derivation rules run by the runCalculatedFields engine: on ingest, on change, and before every outbound webhook payload is built.",
+  "description": "Derivation rules run by the runCalculatedFields engine: on ingest, on change, and before every outbound webhook payload is built. Schema matches the canonical Legenex calculated-fields export format so rule sets move between properties unchanged.",
   "properties": {
-    "token": {
+    "output_token": {
       "type": "string",
-      "description": "Unique output key. Written to Lead.calculated_fields[token]."
+      "description": "Unique output key. Written to Lead.calculated_fields[output_token]."
     },
-    "label": {
+    "output_label": {
       "type": "string"
     },
     "vertical": {
-      "type": "string",
-      "default": "personal_injury"
+      "type": "string"
     },
     "input_field": {
       "type": "string",
-      "description": "A Lead canonical field, a Lead.custom_fields key, or another calculated field's token (see depends_on)"
+      "description": "A Lead canonical field, a Lead.custom_fields key, or another rule's output_token. Empty for conditional rules that read fields from their own conditions."
     },
     "depends_on": {
       "type": "array",
-      "description": "Other CalculatedField tokens this rule consumes. Used for dependency ordering and cycle detection."
+      "description": "Other output_tokens this rule consumes. Used for dependency ordering and cycle detection."
     },
     "transform_type": {
       "type": "string",
@@ -34,8 +33,8 @@
       "default": "value_map"
     },
     "config": {
-      "type": "object",
-      "description": "Transform-specific configuration.\n- value_map: { mappings: [{from,to}], case_insensitive_fallback: bool, default }\n- date_age_bucket: { buckets: [{max_days, value}] (ascending, first fit wins), fallback }\n- clone: {} (copies input straight to output)\n- conditional: { rule_groups: [{ logic: 'ALL'|'ANY', conditions: [{field, operator, value}], output }], fallback_template: '{{token}}' }\n- script: { whitelisted_transform: 'uppercase'|'lowercase'|'trim'|'title_case'|'digits_only'|'concat' }"
+      "type": "string",
+      "description": "Transform-specific configuration, stored as a JSON string (matching the export format).\n- value_map: {\"map\":{from:to},\"default\":\"...\"}\n- date_age_bucket: {\"buckets\":[{\"label\":\"...\",\"max_days\":N}],\"fallback\":\"...\",\"date_format\":\"MM/DD/YYYY\"} \u2014 ascending by max_days, first fit wins\n- clone: {}\n- conditional: {\"rules\":[{\"conditions\":{\"type\":\"group\",\"match\":\"all\"|\"any\",\"children\":[{\"type\":\"condition\",\"field\":\"..\",\"operator\":\"..\",\"value\":\"..\"}]},\"output\":\"..\"}],\"fallback\":\"{{token}}\"}\n- script: {\"script\":\"...\"} \u2014 matched against a whitelist of supported transforms; anything unrecognised returns the original value with an explicit error in the trace"
     },
     "enabled": {
       "type": "boolean",
@@ -47,8 +46,7 @@
     }
   },
   "required": [
-    "token",
-    "label",
+    "output_token",
     "transform_type"
   ]
 }
