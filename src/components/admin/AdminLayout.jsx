@@ -39,7 +39,7 @@ function NavLink({ item, active, collapsed, onClick }) {
   );
 }
 
-export default function AdminLayout({ title, breadcrumbs, children }) {
+export default function AdminLayout({ breadcrumbs, children }) {
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState(null);
