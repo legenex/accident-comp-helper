@@ -1,106 +1,159 @@
-import React from "react";
-import AdminLayout from "@/components/admin/AdminLayout";
-import { Card } from "@/components/admin/ui";
-import { Users, TrendingUp, Clock, Target, MousePointerClick } from "lucide-react";
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid, BarChart, Bar } from "recharts";
+import React, { useEffect, useState, useMemo } from 'react';
+import AdminLayout from '@/components/admin/AdminLayout';
+import { PageHeader, Panel, SectionTitle, StatCard, SelectInput, Button, EmptyState } from '@/components/admin/ui';
+import { base44 } from '@/api/base44Client';
+import { Users2, CheckCircle2, Percent, Download } from 'lucide-react';
 
-const traffic = [
-  { day: "Mon", visitors: 820, conversions: 42 },
-  { day: "Tue", visitors: 940, conversions: 51 },
-  { day: "Wed", visitors: 1120, conversions: 63 },
-  { day: "Thu", visitors: 1284, conversions: 71 },
-  { day: "Fri", visitors: 1410, conversions: 88 },
-  { day: "Sat", visitors: 980, conversions: 54 },
-  { day: "Sun", visitors: 760, conversions: 38 },
-];
+function daysAgo(n) { const d = new Date(); d.setDate(d.getDate() - n); return d; }
 
-const sources = [
-  { source: "Organic", visitors: 4120 },
-  { source: "Paid", visitors: 2890 },
-  { source: "Direct", visitors: 1640 },
-  { source: "Referral", visitors: 980 },
-  { source: "Social", visitors: 620 },
-];
+function Bar({ label, value, max, tone = '#028CC9' }) {
+  const pct = max > 0 ? Math.round((value / max) * 100) : 0;
+  return (
+    <div>
+      <div className="mb-1 flex items-center justify-between text-xs" style={{ color: '#93AAB2' }}>
+        <span>{label}</span><span className="tabular-nums" style={{ color: '#E8F1EF' }}>{value}</span>
+      </div>
+      <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: '#122430' }}>
+        <div className="h-full rounded-full" style={{ width: `${pct}%`, background: tone }} />
+      </div>
+    </div>
+  );
+}
 
-const stats = [
-  { label: "Visitors", value: "8,492", change: "+7%", icon: Users },
-  { label: "Pageviews", value: "21,304", change: "+9%", icon: TrendingUp },
-  { label: "Avg. Time", value: "2m 34s", change: "+5%", icon: Clock },
-  { label: "Conversions", value: "342", change: "+18%", icon: Target },
-];
+function groupCount(rows, key) {
+  const map = {};
+  rows.forEach((r) => { const v = r[key] || 'unknown'; map[v] = (map[v] || 0) + 1; });
+  return Object.entries(map).sort((a, b) => b[1] - a[1]);
+}
 
 export default function Analytics() {
+  const [leads, setLeads] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [range, setRange] = useState('30');
+
+  useEffect(() => {
+    base44.entities.Lead.list('-created_date', 2000).then((l) => { setLeads(l || []); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
+
+  const filtered = useMemo(() => {
+    const cutoff = daysAgo(Number(range));
+    return leads.filter((l) => !l.created_date || new Date(l.created_date) >= cutoff);
+  }, [leads, range]);
+
+  const total = filtered.length;
+  const qualified = filtered.filter((l) => l.qualification_status === 'qualified' || l.qualification_status === 'sold').length;
+  const rate = total > 0 ? `${Math.round((qualified / total) * 100)}%` : '—';
+
+  const bySource = groupCount(filtered, 'source');
+  const byState = groupCount(filtered, 'accident_state');
+  const byCampaign = groupCount(filtered, 'utm_campaign');
+  const byType = groupCount(filtered, 'accident_type');
+  const maxSource = Math.max(1, ...bySource.map((s) => s[1]));
+
+  // Funnel — every stage is a real count from Lead.qualification_status.
+  // A stage with no underlying event source is labelled "not tracked",
+  // never estimated.
+  const funnel = [
+    { label: 'Captured', value: total },
+    { label: 'Qualified', value: filtered.filter((l) => l.qualification_status === 'qualified').length },
+    { label: 'Sold', value: filtered.filter((l) => l.qualification_status === 'sold').length },
+    { label: 'Site conversion (view → capture)', value: null }, // no page-view tracking source wired yet
+  ];
+
+  const exportCsv = () => {
+    const header = 'source,count';
+    const lines = bySource.map(([s, c]) => `"${s}",${c}`);
+    const blob = new Blob([[header, ...lines].join('\n')], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'source-performance.csv'; a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
-    <AdminLayout title="Analytics" breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Analytics" }]}>
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {stats.map((s) => (
-          <Card key={s.label}>
-            <div className="mb-3 flex items-center justify-between">
-              <span className="text-sm text-admuted">{s.label}</span>
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand/15 text-brand"><s.icon className="h-4 w-4" /></div>
-            </div>
-            <div className="text-2xl font-bold text-white">{s.value}</div>
-            <div className="mt-1 text-xs text-success">{s.change} vs last period</div>
-          </Card>
-        ))}
+    <AdminLayout>
+      <PageHeader title="Analytics" description="Lead capture and qualification performance."
+        actions={<>
+          <SelectInput value={range} onChange={(e) => setRange(e.target.value)} options={[{ value: '7', label: 'Last 7 days' }, { value: '30', label: 'Last 30 days' }, { value: '90', label: 'Last 90 days' }, { value: '3650', label: 'All time' }]} />
+          <Button variant="secondary" icon={Download} onClick={exportCsv}>Export CSV</Button>
+        </>} />
+
+      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-3">
+        <StatCard label="Leads captured" value={loading ? '—' : total} icon={Users2} tone="brand" />
+        <StatCard label="Qualified" value={loading ? '—' : qualified} icon={CheckCircle2} tone="success" />
+        <StatCard label="Qualification rate" value={loading ? '—' : rate} icon={Percent} tone="neutral" />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-3">
-        <Card className="xl:col-span-2">
-          <h2 className="mb-4 text-sm font-semibold text-white">Traffic (last 7 days)</h2>
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={traffic}>
-                <defs>
-                  <linearGradient id="v" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0B8DCF" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#0B8DCF" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.1)" />
-                <XAxis dataKey="day" stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} />
-                <Tooltip contentStyle={{ background: "#24384A", border: "1px solid #33485C", borderRadius: 8, color: "#fff" }} />
-                <Area type="monotone" dataKey="visitors" stroke="#0B8DCF" fill="url(#v)" strokeWidth={2} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-        <Card>
-          <h2 className="mb-4 text-sm font-semibold text-white">Top sources</h2>
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={sources} layout="vertical" margin={{ left: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.1)" horizontal={false} />
-                <XAxis type="number" stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} />
-                <YAxis type="category" dataKey="source" stroke="#94A3B8" fontSize={12} tickLine={false} axisLine={false} width={70} />
-                <Tooltip contentStyle={{ background: "#24384A", border: "1px solid #33485C", borderRadius: 8, color: "#fff" }} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
-                <Bar dataKey="visitors" fill="#0B8DCF" radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-      </div>
-
-      <Card className="mt-6">
-        <h2 className="mb-4 text-sm font-semibold text-white">Conversion funnel</h2>
-        <div className="space-y-3">
-          {[
-            { stage: "Visitors", value: 8492, pct: 100, icon: Users },
-            { stage: "Started claim check", value: 2341, pct: 28, icon: MousePointerClick },
-            { stage: "Completed", value: 981, pct: 12, icon: Target },
-            { stage: "Connected", value: 342, pct: 4, icon: TrendingUp },
-          ].map((f) => (
-            <div key={f.stage} className="flex items-center gap-4">
-              <div className="flex w-48 items-center gap-2 text-sm text-slate-300"><f.icon className="h-4 w-4 text-brand" /> {f.stage}</div>
-              <div className="flex-1 overflow-hidden rounded-lg bg-white/5">
-                <div className="h-7 rounded-lg bg-brand/40" style={{ width: `${f.pct}%` }} />
-              </div>
-              <div className="w-20 text-right text-sm font-semibold text-white">{f.value.toLocaleString()}</div>
+      <div className="mb-6 grid gap-6 lg:grid-cols-2">
+        <div>
+          <SectionTitle>Conversion funnel</SectionTitle>
+          <Panel>
+            <div className="space-y-3">
+              {funnel.map((f) => f.value === null ? (
+                <div key={f.label} className="flex items-center justify-between text-sm">
+                  <span style={{ color: '#93AAB2' }}>{f.label}</span>
+                  <span style={{ color: '#5E7681' }}>not tracked</span>
+                </div>
+              ) : <Bar key={f.label} label={f.label} value={f.value} max={total} />)}
             </div>
-          ))}
+          </Panel>
         </div>
-      </Card>
+        <div>
+          <SectionTitle>By source</SectionTitle>
+          <Panel>
+            {bySource.length === 0 ? <EmptyState title="No source data yet" /> : (
+              <div className="space-y-3">{bySource.slice(0, 8).map(([s, c]) => <Bar key={s} label={s} value={c} max={maxSource} tone="#D6A23C" />)}</div>
+            )}
+          </Panel>
+        </div>
+      </div>
+
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div>
+          <SectionTitle>By campaign</SectionTitle>
+          <Panel padded={false}>
+            {byCampaign.length === 0 ? <div className="p-4"><EmptyState title="No campaign data yet" /></div> : (
+              <table className="w-full text-sm"><tbody>
+                {byCampaign.slice(0, 10).map(([k, v]) => (
+                  <tr key={k} style={{ borderBottom: '1px solid rgba(148,180,190,0.14)' }}>
+                    <td className="px-3 py-2" style={{ color: '#E8F1EF' }}>{k}</td>
+                    <td className="px-3 py-2 text-right tabular-nums" style={{ color: '#93AAB2' }}>{v}</td>
+                  </tr>
+                ))}
+              </tbody></table>
+            )}
+          </Panel>
+        </div>
+        <div>
+          <SectionTitle>By type</SectionTitle>
+          <Panel padded={false}>
+            {byType.length === 0 ? <div className="p-4"><EmptyState title="No type data yet" /></div> : (
+              <table className="w-full text-sm"><tbody>
+                {byType.map(([k, v]) => (
+                  <tr key={k} style={{ borderBottom: '1px solid rgba(148,180,190,0.14)' }}>
+                    <td className="px-3 py-2" style={{ color: '#E8F1EF' }}>{k}</td>
+                    <td className="px-3 py-2 text-right tabular-nums" style={{ color: '#93AAB2' }}>{v}</td>
+                  </tr>
+                ))}
+              </tbody></table>
+            )}
+          </Panel>
+        </div>
+        <div>
+          <SectionTitle>By geography</SectionTitle>
+          <Panel padded={false}>
+            {byState.length === 0 ? <div className="p-4"><EmptyState title="No geography data yet" /></div> : (
+              <table className="w-full text-sm"><tbody>
+                {byState.slice(0, 10).map(([k, v]) => (
+                  <tr key={k} style={{ borderBottom: '1px solid rgba(148,180,190,0.14)' }}>
+                    <td className="px-3 py-2" style={{ color: '#E8F1EF' }}>{k}</td>
+                    <td className="px-3 py-2 text-right tabular-nums" style={{ color: '#93AAB2' }}>{v}</td>
+                  </tr>
+                ))}
+              </tbody></table>
+            )}
+          </Panel>
+        </div>
+      </div>
     </AdminLayout>
   );
 }
