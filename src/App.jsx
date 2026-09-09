@@ -62,6 +62,9 @@ import GeneralSettings from '@/pages/admin/settings/General';
 import UsersSettings from '@/pages/admin/settings/Users';
 import SeoSettings from '@/pages/admin/settings/SEO';
 import IntegrationsSettings from '@/pages/admin/settings/Integrations';
+import TrackingSettings from '@/pages/admin/settings/Tracking';
+import BotSettings from '@/pages/admin/settings/Bot';
+import KnowledgeBaseSettings from '@/pages/admin/settings/KnowledgeBase';
 import ThemesAdmin from '@/pages/admin/Themes';
 
 const AuthenticatedApp = () => {
@@ -148,9 +151,9 @@ const AuthenticatedApp = () => {
           <Route path="/admin/settings/users" element={<UsersSettings />} />
           <Route path="/admin/settings/seo" element={<SeoSettings />} />
           <Route path="/admin/settings/integrations" element={<IntegrationsSettings />} />
-          <Route path="/admin/settings/tracking" element={<IntegrationsSettings />} />
-          <Route path="/admin/settings/bot" element={<ClaimBotAdmin />} />
-          <Route path="/admin/settings/knowledge-base" element={<ClaimBotAdmin />} />
+          <Route path="/admin/settings/tracking" element={<TrackingSettings />} />
+          <Route path="/admin/settings/bot" element={<BotSettings />} />
+          <Route path="/admin/settings/knowledge-base" element={<KnowledgeBaseSettings />} />
           <Route path="/admin/themes" element={<ThemesAdmin />} />
 
           {/* Legacy bookmarks — never delete a route, redirect it */}
