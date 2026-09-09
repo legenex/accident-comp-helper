@@ -72,9 +72,9 @@ export default function ContactForms() {
               <div className="mb-1.5 text-xs font-medium" style={{ color: '#93AAB2' }}>Fields (from the registry)</div>
               <div className="max-h-48 space-y-1 overflow-y-auto rounded-lg p-2" style={{ border: '1px solid rgba(148,180,190,0.14)' }}>
                 {registry.length === 0 ? <p className="p-2 text-sm" style={{ color: '#5E7681' }}>No fields in the registry yet — add some under Custom Fields first.</p> : registry.map((f) => (
-                  <label key={f.canonical_name} className="flex items-center gap-2 rounded px-2 py-1.5 text-sm" style={{ color: '#E8F1EF' }}>
-                    <input type="checkbox" checked={(editing.field_keys || []).includes(f.canonical_name)} onChange={() => toggleField(f.canonical_name)} />
-                    {f.label} <span className="font-mono text-xs" style={{ color: '#5E7681' }}>({f.canonical_name})</span>
+                  <label key={f.field_name} className="flex items-center gap-2 rounded px-2 py-1.5 text-sm" style={{ color: '#E8F1EF' }}>
+                    <input type="checkbox" checked={(editing.field_keys || []).includes(f.field_name)} onChange={() => toggleField(f.field_name)} />
+                    {f.label} <span className="font-mono text-xs" style={{ color: '#5E7681' }}>({f.field_name})</span>
                   </label>
                 ))}
               </div>
