@@ -7,6 +7,8 @@ import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import RequireRole from '@/components/admin/RequireRole';
+import { ROUTE_REDIRECTS } from '@/lib/admin-nav';
 
 // Auth pages
 import Login from '@/pages/Login';
@@ -34,23 +36,33 @@ import LandingPagePublic from '@/pages/LandingPagePublic';
 import SurveyPage from '@/pages/SurveyPage';
 import ExperimentPage from '@/pages/ExperimentPage';
 
-// Admin
-import Dashboard from '@/pages/admin/Dashboard';
+// Admin — primary
+import Overview from '@/pages/admin/Overview';
+import Leads from '@/pages/admin/Leads';
 import PagesAdmin from '@/pages/admin/Pages';
+import AnalyticsAdmin from '@/pages/admin/Analytics';
 import BlogAdmin from '@/pages/admin/Blog';
-import SEOAdmin from '@/pages/admin/SEO';
-import Analytics from '@/pages/admin/Analytics';
-import Signals from '@/pages/admin/Signals';
-import Advertorials from '@/pages/admin/Advertorials';
-import ClaimBot from '@/pages/admin/ClaimBot';
-import Experiments from '@/pages/admin/Experiments';
+import SurveysAdmin from '@/pages/admin/Surveys';
+import LandingPagesAdmin from '@/pages/admin/LandingPages';
+import AdvertorialsAdmin from '@/pages/admin/Advertorials';
+import ClaimBotAdmin from '@/pages/admin/ClaimBot';
+import NewsInsightsAdmin from '@/pages/admin/NewsInsights';
+
+// Admin — tools
+import CalculatedFields from '@/pages/admin/tools/CalculatedFields';
+import Webhooks from '@/pages/admin/tools/Webhooks';
+import CustomFields from '@/pages/admin/tools/CustomFields';
+import ContactForms from '@/pages/admin/tools/ContactForms';
+import CompletionRouting from '@/pages/admin/tools/CompletionRouting';
+import ExperimentsAdmin from '@/pages/admin/Experiments';
 import ExperimentEditor from '@/pages/admin/ExperimentEditor';
-import Surveys from '@/pages/admin/Surveys';
-import Themes from '@/pages/admin/Themes';
-import LandingPages from '@/pages/admin/LandingPages';
-import Integrations from '@/pages/admin/Integrations';
-import UserManagement from '@/pages/admin/UserManagement';
-import Settings from '@/pages/admin/Settings';
+
+// Admin — settings
+import GeneralSettings from '@/pages/admin/settings/General';
+import UsersSettings from '@/pages/admin/settings/Users';
+import SeoSettings from '@/pages/admin/settings/SEO';
+import IntegrationsSettings from '@/pages/admin/settings/Integrations';
+import ThemesAdmin from '@/pages/admin/Themes';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -106,25 +118,46 @@ const AuthenticatedApp = () => {
       <Route path="/tools/*" element={<ExperimentPage />} />
       <Route path="/community/*" element={<ExperimentPage />} />
 
-      {/* Admin */}
+      {/* Admin — auth-gated, then role-gated */}
       <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
-        <Route path="/admin" element={<Dashboard />} />
-        <Route path="/admin/pages" element={<PagesAdmin />} />
-        <Route path="/admin/blog" element={<BlogAdmin />} />
-        <Route path="/admin/seo" element={<SEOAdmin />} />
-        <Route path="/admin/analytics" element={<Analytics />} />
-        <Route path="/admin/signals" element={<Signals />} />
-        <Route path="/admin/advertorials" element={<Advertorials />} />
-        <Route path="/admin/claimbot" element={<ClaimBot />} />
-        <Route path="/admin/experiments" element={<Experiments />} />
-        <Route path="/admin/experiments/new" element={<ExperimentEditor />} />
-        <Route path="/admin/experiments/:id/edit" element={<ExperimentEditor />} />
-        <Route path="/admin/surveys" element={<Surveys />} />
-        <Route path="/admin/themes" element={<Themes />} />
-        <Route path="/admin/landing-pages" element={<LandingPages />} />
-        <Route path="/admin/integrations" element={<Integrations />} />
-        <Route path="/admin/users" element={<UserManagement />} />
-        <Route path="/admin/settings" element={<Settings />} />
+        <Route element={<RequireRole />}>
+          {/* Primary */}
+          <Route path="/admin" element={<Overview />} />
+          <Route path="/admin/leads" element={<Leads />} />
+          <Route path="/admin/pages" element={<PagesAdmin />} />
+          <Route path="/admin/analytics" element={<AnalyticsAdmin />} />
+          <Route path="/admin/blog" element={<BlogAdmin />} />
+          <Route path="/admin/surveys" element={<SurveysAdmin />} />
+          <Route path="/admin/landing-pages" element={<LandingPagesAdmin />} />
+          <Route path="/admin/advertorials" element={<AdvertorialsAdmin />} />
+          <Route path="/admin/claimbot" element={<ClaimBotAdmin />} />
+          <Route path="/admin/news-insights" element={<NewsInsightsAdmin />} />
+
+          {/* Tools */}
+          <Route path="/admin/tools/calculated-fields" element={<CalculatedFields />} />
+          <Route path="/admin/tools/webhooks" element={<Webhooks />} />
+          <Route path="/admin/tools/custom-fields" element={<CustomFields />} />
+          <Route path="/admin/tools/contact-forms" element={<ContactForms />} />
+          <Route path="/admin/tools/completion-routing" element={<CompletionRouting />} />
+          <Route path="/admin/experiments" element={<ExperimentsAdmin />} />
+          <Route path="/admin/experiments/new" element={<ExperimentEditor />} />
+          <Route path="/admin/experiments/:id/edit" element={<ExperimentEditor />} />
+
+          {/* Settings */}
+          <Route path="/admin/settings/general" element={<GeneralSettings />} />
+          <Route path="/admin/settings/users" element={<UsersSettings />} />
+          <Route path="/admin/settings/seo" element={<SeoSettings />} />
+          <Route path="/admin/settings/integrations" element={<IntegrationsSettings />} />
+          <Route path="/admin/settings/tracking" element={<IntegrationsSettings />} />
+          <Route path="/admin/settings/bot" element={<ClaimBotAdmin />} />
+          <Route path="/admin/settings/knowledge-base" element={<ClaimBotAdmin />} />
+          <Route path="/admin/themes" element={<ThemesAdmin />} />
+
+          {/* Legacy bookmarks — never delete a route, redirect it */}
+          {Object.entries(ROUTE_REDIRECTS).map(([from, to]) => (
+            <Route key={from} path={from} element={<Navigate to={to} replace />} />
+          ))}
+        </Route>
       </Route>
 
       <Route path="*" element={<PageNotFound />} />
