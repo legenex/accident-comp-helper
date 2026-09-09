@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { PageHeader, Panel, Button, TextInput, SelectInput, SearchInput, DataTable, Pill, Modal, ConfirmDialog, Toggle, StatusBadge } from '@/components/admin/ui';
 import { base44 } from '@/api/base44Client';
@@ -16,6 +16,7 @@ export default function CustomFields() {
   const [editing, setEditing] = useState(null);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [blockedRefs, setBlockedRefs] = useState(null);
+  const importInputRef = useRef(null);
 
   const load = async () => {
     setLoading(true); setError(null);
@@ -93,9 +94,8 @@ export default function CustomFields() {
         title="Custom Fields"
         description="The field registry — the dictionary everything else references. No feature invents its own field name."
         actions={<>
-          <Button variant="secondary" icon={Upload} as="label">
-            Import<input type="file" accept="application/json" className="hidden" onChange={importJson} />
-          </Button>
+          <Button variant="secondary" icon={Upload} onClick={() => importInputRef.current?.click()}>Import</Button>
+          <input ref={importInputRef} type="file" accept="application/json" className="hidden" onChange={importJson} />
           <Button variant="secondary" icon={Download} onClick={exportJson}>Export</Button>
           <Button variant="gold" icon={Plus} onClick={() => setEditing({ ...blank })}>New Field</Button>
         </>}
