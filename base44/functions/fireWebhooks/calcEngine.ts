@@ -1,7 +1,8 @@
-// Shared calculated-fields engine logic, imported directly (never over a
-// network hop) by both runCalculatedFields/entry.ts and fireWebhooks/entry.ts.
-// fireWebhooks must re-run calculations inline so a dead second hop can never
-// leave an outbound payload unenriched.
+// Shared calculated-fields engine logic. Duplicated (not imported across
+// function boundaries — Base44 functions can't reach outside their own
+// folder) into both runCalculatedFields/ and fireWebhooks/ so fireWebhooks
+// can re-run calculations inline without a network hop. Keep both copies in
+// sync when editing.
 
 export const OPERATORS = {
   equals: (a, b) => String(a ?? '') === String(b ?? ''),
@@ -104,8 +105,6 @@ function runTransform(field, ctx) {
   }
 }
 
-// Topological sort by depends_on, ties broken by sort_order. Cycles are
-// detected and reported, never followed — cyclic nodes run in sort_order.
 export function orderFields(fields) {
   const byToken = new Map(fields.map((f) => [f.token, f]));
   const remaining = new Set(fields.map((f) => f.token));
@@ -128,8 +127,6 @@ export function orderFields(fields) {
   return { ordered, cycleDetected };
 }
 
-// Runs every enabled (optionally pre-filtered) CalculatedField def against a
-// record in memory. Never persists — callers decide whether/how to save.
 export function runCalculatedFieldsInline(record, defs) {
   const enabled = (defs || []).filter((f) => f.enabled !== false);
   const { ordered, cycleDetected } = orderFields(enabled);
