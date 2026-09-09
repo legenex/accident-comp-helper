@@ -2,7 +2,7 @@
 // its own button, input, table or modal. If something is missing, add it
 // here. Every colour comes from `A` in admin-ds.js; no hex is hardcoded in
 // any page component.
-import React, { useState } from 'react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 import { A, toneFor, toneColors } from '@/lib/admin-ds';
 import { ChevronRight, ChevronDown, Search, X, AlertTriangle, RotateCw, Inbox } from 'lucide-react';

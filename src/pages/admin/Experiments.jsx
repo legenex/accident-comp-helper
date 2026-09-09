@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, LegacyPill, AdminButton, SearchBar, LegacySelect, LegacyEmptyState, LegacyModal } from "@/components/admin/ui";
 import { base44 } from "@/api/base44Client";
-import { Plus, Eye, Edit, Trash2, Copy, ExternalLink, ToggleLeft, ToggleRight, Sparkles, Beaker } from "lucide-react";
+import { Plus, Edit, Trash2, Copy, ExternalLink, ToggleLeft, ToggleRight, Sparkles, Beaker } from "lucide-react";
 
 const STATUS_TONE = { published: "success", draft: "neutral", archived: "danger" };
 const BUILD_TONE = { planned: "neutral", in_progress: "warning", beta: "purple", live: "success" };

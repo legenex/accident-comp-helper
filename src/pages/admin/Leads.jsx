@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { PageHeader, Panel, Button, TextInput, SelectInput, SearchInput, DataTable, Pagination, StatusBadge, Tabs, FieldRow, Modal, EmptyState } from '@/components/admin/ui';
+import { PageHeader, Panel, Button, SelectInput, SearchInput, DataTable, Pagination, StatusBadge, Tabs, FieldRow, Modal, EmptyState } from '@/components/admin/ui';
 import { base44 } from '@/api/base44Client';
 import { Download, RefreshCw, Users2, Columns } from 'lucide-react';
 

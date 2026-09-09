@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { PageHeader, Panel, SectionTitle, StatCard, DataTable, StatusBadge, Button, NotConfigured, EmptyState } from '@/components/admin/ui';
+import { PageHeader, Panel, SectionTitle, StatCard, DataTable, StatusBadge, NotConfigured, EmptyState } from '@/components/admin/ui';
 import { base44 } from '@/api/base44Client';
 import { Users2, CheckCircle2, Webhook as WebhookIcon, AlertTriangle, FileText, BookOpen } from 'lucide-react';
 

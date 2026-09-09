@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, AdminButton, Field, AdminInput, LegacyPill } from "@/components/admin/ui";
-import { Bot, Save, MessageSquare, Sparkles } from "lucide-react";
+import { Bot, Save } from "lucide-react";
 
 export default function ClaimBot() {
   const [config, setConfig] = useState({

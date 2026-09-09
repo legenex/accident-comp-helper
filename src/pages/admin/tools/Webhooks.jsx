@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import AdminLayout from '@/components/admin/AdminLayout';
-import { PageHeader, Panel, Button, TextInput, SelectInput, DataTable, Pill, Modal, ConfirmDialog, Toggle, StatusBadge, Tabs, EmptyState } from '@/components/admin/ui';
+import { PageHeader, Panel, Button, TextInput, SelectInput, DataTable, Modal, ConfirmDialog, Toggle, StatusBadge, Tabs, EmptyState } from '@/components/admin/ui';
 import { base44 } from '@/api/base44Client';
 import { Plus, Edit, Trash2, Webhook as WebhookIcon, History } from 'lucide-react';
 
