@@ -95,7 +95,7 @@ function LeadDetail({ lead, onClose, onRecalculated }) {
         )}
         {tab === 'Calculated' && (
           calcDefs.length === 0 ? <EmptyState title="No calculated fields defined yet" /> :
-          calcDefs.map((f) => <FieldRow key={f.id} label={f.label} value={current.calculated_fields?.[f.token] !== undefined ? String(current.calculated_fields[f.token]) : 'not produced'} />)
+          calcDefs.map((f) => <FieldRow key={f.id} label={f.output_label || f.output_token} value={current.calculated_fields?.[f.output_token] !== undefined && current.calculated_fields?.[f.output_token] !== null ? String(current.calculated_fields[f.output_token]) : 'not produced'} />)
         )}
         {tab === 'Tracking' && (<div>
           <FieldRow label="IP address" value={current.ip_address} /><FieldRow label="User agent" value={current.user_agent} />
