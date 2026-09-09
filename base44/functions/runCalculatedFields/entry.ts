@@ -8,7 +8,7 @@
 //   { sample: {...} }              run against ad-hoc values, dry-run only
 //   { lead_id | sample, field_id } restrict to a single field (Test button)
 import { createClientFromRequest } from 'npm:@base44/sdk';
-import { runCalculatedFieldsInline } from '../_shared/calcEngine.ts';
+import { runCalculatedFieldsInline } from './calcEngine.ts';
 
 Deno.serve(async (req) => {
   try {
