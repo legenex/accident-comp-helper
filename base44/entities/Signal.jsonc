@@ -1,11 +1,19 @@
 {
   "name": "Signal",
   "type": "object",
+  "description": "A News & Insights item \u2014 an MVA/personal-injury news story, ruling, or regulatory change tracked for content and compliance relevance.",
   "properties": {
     "title": {
       "type": "string"
     },
     "source": {
+      "type": "string",
+      "description": "Publication name"
+    },
+    "source_url": {
+      "type": "string"
+    },
+    "published_at": {
       "type": "string"
     },
     "status": {
@@ -20,13 +28,35 @@
     },
     "score": {
       "type": "number",
-      "default": 0
+      "default": 0,
+      "description": "Relevance score 0-100"
     },
     "category": {
-      "type": "string"
+      "type": "string",
+      "description": "e.g. verdict_settlement, regulation, safety_recall, litigation_trend, state_law, insurance"
+    },
+    "state": {
+      "type": "string",
+      "description": "Two-letter state code when the item is jurisdiction-specific"
     },
     "summary": {
       "type": "string"
+    },
+    "relevance_reason": {
+      "type": "string",
+      "description": "Why this matters to the MVA vertical"
+    },
+    "content_angle": {
+      "type": "string",
+      "description": "The article or ad angle this suggests"
+    },
+    "promoted_post_id": {
+      "type": "string",
+      "description": "BlogPost created from this signal, once promoted"
+    },
+    "compliance_flags": {
+      "type": "array",
+      "description": "Banned-phrase matches in the summary or angle. A flagged signal cannot be promoted to a draft until cleared."
     }
   },
   "required": [
