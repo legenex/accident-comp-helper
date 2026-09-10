@@ -12,6 +12,8 @@
       "type": "string",
       "enum": [
         "draft",
+        "review",
+        "scheduled",
         "published",
         "archived"
       ],
@@ -21,13 +23,18 @@
       "type": "string"
     },
     "body": {
-      "type": "string"
+      "type": "string",
+      "description": "Markdown"
     },
     "author": {
       "type": "string"
     },
     "category": {
-      "type": "string"
+      "type": "string",
+      "description": "BlogCategory slug"
+    },
+    "tags": {
+      "type": "array"
     },
     "featured_image": {
       "type": "string"
@@ -35,6 +42,47 @@
     "views": {
       "type": "number",
       "default": 0
+    },
+    "meta_title": {
+      "type": "string"
+    },
+    "meta_description": {
+      "type": "string"
+    },
+    "canonical_url": {
+      "type": "string"
+    },
+    "publish_at": {
+      "type": "string",
+      "description": "ISO datetime; used when status is scheduled"
+    },
+    "published_at": {
+      "type": "string"
+    },
+    "reading_time_minutes": {
+      "type": "number",
+      "default": 0
+    },
+    "cta_id": {
+      "type": "string",
+      "description": "BlogCTA to inject; falls back to the default CTA when empty"
+    },
+    "cta_position": {
+      "type": "string",
+      "enum": [
+        "top",
+        "middle",
+        "bottom",
+        "none"
+      ],
+      "default": "bottom"
+    },
+    "compliance_flags": {
+      "type": "array",
+      "description": "Banned-phrase matches found at authoring time, e.g. [{phrase, context}]. Publishing is blocked while any remain \u2014 the check runs against BlogInstructions.banned_patterns."
+    },
+    "compliance_checked_at": {
+      "type": "string"
     }
   },
   "required": [
