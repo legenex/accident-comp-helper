@@ -7,7 +7,7 @@ import {
 import { base44 } from '@/api/base44Client';
 import {
   Plus, Edit, Trash2, ListChecks, ExternalLink, ChevronUp, ChevronDown,
-  Copy, Eye, AlertTriangle,
+  Copy, AlertTriangle,
 } from 'lucide-react';
 import { slugify } from '@/lib/compliance';
 

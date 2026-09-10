@@ -65,7 +65,7 @@ function BucketEditor({ cfg, setCfg }) {
 function RawJsonEditor({ cfg, setCfg, hint }) {
   const [text, setText] = useState(JSON.stringify(cfg || {}, null, 2));
   const [err, setErr] = useState(null);
-  useEffect(() => { setText(JSON.stringify(cfg || {}, null, 2)); /* eslint-disable-next-line */ }, []);
+  useEffect(() => { setText(JSON.stringify(cfg || {}, null, 2));   }, []);
   return (
     <TextArea label="Config (JSON)" hint={hint} error={err} rows={12} value={text}
       onChange={(e) => {

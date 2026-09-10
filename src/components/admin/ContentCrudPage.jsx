@@ -41,7 +41,7 @@ export default function ContentCrudPage({
     catch (e) { setError(e?.message || `Failed to load ${title.toLowerCase()}`); }
     setLoading(false);
   };
-  useEffect(() => { load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [entityName]);
+  useEffect(() => { load();   }, [entityName]);
 
   const statuses = useMemo(() => ['All', ...new Set(rows.map((r) => r.status).filter(Boolean))], [rows]);
 
