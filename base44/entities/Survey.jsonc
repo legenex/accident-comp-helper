@@ -21,9 +21,14 @@
       "type": "string"
     },
     "questions": {
-      "type": "array"
+      "type": "array",
+      "description": "Ordered steps. Each: { id, prompt, help_text, type: 'single'|'multi'|'text'|'email'|'phone'|'date'|'number'|'state', field_name (CustomField.field_name this answer writes to), required, options: [{ value, label, dq: bool, dq_reason }], show_if: { field, operator, value } }.\n\nDQ RULE: a dq option flags the response but NEVER ends the flow early. Disqualification is resolved only at the END, so every respondent completes the survey."
     },
     "responses": {
+      "type": "number",
+      "default": 0
+    },
+    "completions": {
       "type": "number",
       "default": 0
     },
@@ -33,7 +38,18 @@
     },
     "completion_routing": {
       "type": "object",
-      "description": "Where a completed (or disqualified) respondent lands, configured per flow rather than hardcoded. e.g. { qualified_url: '/submitted', disqualified_url: '/thanks', fallback_url: '/thanks' }. Disqualification is always resolved at the END of the flow."
+      "description": "Where a completed (or disqualified) respondent lands, configured per flow rather than hardcoded. e.g. { qualified_url: '/submitted', disqualified_url: '/thanks', fallback_url: '/thanks' }. Disqualified respondents always go to the thanks page, never a separate sorry page."
+    },
+    "consent_text": {
+      "type": "string",
+      "description": "TCPA-style consent copy shown at the capture step"
+    },
+    "consent_version": {
+      "type": "string"
+    },
+    "submit_button_text": {
+      "type": "string",
+      "default": "See my result"
     }
   },
   "required": [
