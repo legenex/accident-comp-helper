@@ -5,7 +5,7 @@ import {
   StatusBadge, Modal, ConfirmDialog, EmptyState, Tabs, Pill, NotConfigured, Pagination,
 } from '@/components/admin/ui';
 import { base44 } from '@/api/base44Client';
-import { Plus, Edit, Trash2, BookOpen, ShieldAlert, ShieldCheck, ExternalLink, Tag, Megaphone } from 'lucide-react';
+import { Plus, Edit, Trash2, BookOpen, ShieldAlert, ShieldCheck, ExternalLink, Tag, Megaphone, Clock } from 'lucide-react';
 import { checkFields, readingTimeMinutes, slugify } from '@/lib/compliance';
 
 const PAGE_SIZE = 20;
@@ -36,6 +36,7 @@ export default function BlogManager() {
 
   const [editingCategory, setEditingCategory] = useState(null);
   const [editingCta, setEditingCta] = useState(null);
+  const [runningSchedule, setRunningSchedule] = useState(false);
 
   const load = async () => {
     setLoading(true); setError(null);
@@ -119,10 +120,45 @@ export default function BlogManager() {
     setEditingCta(null); load();
   };
 
+  const scheduledDue = posts.filter(
+    (p) => p.status === 'scheduled' && p.publish_at && new Date(p.publish_at).getTime() <= Date.now()
+  ).length;
+
+  // Scheduled posts are normally published by a scheduled run of this
+  // function. This button exists so the state is recoverable by hand if the
+  // schedule hasn't been set up yet, rather than posts silently sitting due.
+  const runSchedule = async () => {
+    setRunningSchedule(true); setNotice(null);
+    try {
+      const res = await base44.functions.invoke('publishScheduledPosts', {});
+      const payload = res?.data || res;
+      if (payload?.ok === false) throw new Error(payload.error || 'The run failed.');
+      const pub = (payload.published || []).length;
+      const skip = payload.skipped || [];
+      setNotice(
+        `Published ${pub} scheduled post(s).` +
+        (skip.length ? ` Skipped ${skip.length}: ${skip.map((s) => `${s.title} (${s.reason})`).join('; ')}` : '')
+      );
+      load();
+    } catch (e) {
+      setNotice(`Scheduled run failed: ${e?.message || String(e)}`);
+    }
+    setRunningSchedule(false);
+  };
+
   return (
     <AdminLayout>
       <PageHeader title="Blog Manager" description="Posts, categories, and reusable CTAs. Publishing is gated on the compliance check."
-        actions={tab === 'posts' ? <Button variant="gold" icon={Plus} onClick={openNew}>New Post</Button>
+        actions={tab === 'posts' ? (
+          <>
+            {scheduledDue > 0 && (
+              <Button variant="secondary" icon={Clock} loading={runningSchedule} onClick={runSchedule}>
+                Publish {scheduledDue} due
+              </Button>
+            )}
+            <Button variant="gold" icon={Plus} onClick={openNew}>New Post</Button>
+          </>
+        )
           : tab === 'categories' ? <Button variant="gold" icon={Plus} onClick={() => setEditingCategory({ name: '', slug: '', description: '' })}>New Category</Button>
           : <Button variant="gold" icon={Plus} onClick={() => setEditingCta({ name: '', headline: '', body: '', button_text: 'Check my claim', button_url: 'https://quiz.accidentcompensationhelper.com/s/eval', is_default: false })}>New CTA</Button>} />
 
