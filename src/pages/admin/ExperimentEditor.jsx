@@ -1,131 +1,180 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
-import AdminLayout from "@/components/admin/AdminLayout";
-import { Card, AdminButton, AdminInput, Field, LegacyPill } from "@/components/admin/ui";
-import { base44 } from "@/api/base44Client";
-import { ArrowLeft, Save } from "lucide-react";
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import AdminLayout from '@/components/admin/AdminLayout';
+import {
+  PageHeader, Panel, Button, TextInput, TextArea, SelectInput, Tabs,
+  SectionTitle, FieldRow, StatusBadge, ConfirmDialog,
+} from '@/components/admin/ui';
+import { base44 } from '@/api/base44Client';
+import { Save, ArrowLeft, Trash2, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { checkFields, slugify } from '@/lib/compliance';
 
-const TEMPLATES = [
-  { type: "claim_estimator", label: "AI Claim Estimator", path: "/tools/claim-estimator" },
-  { type: "settlement_ticker", label: "Live Settlement Ticker", path: "/tools/recent-wins" },
-  { type: "letter_analyzer", label: "Settlement Offer Letter Analyzer", path: "/tools/letter-analyzer" },
-  { type: "state_map", label: "State-Interactive Claim Map", path: "/tools/state-map" },
-  { type: "letter_generator", label: "Dear Adjuster Letter Generator", path: "/tools/letter-generator" },
-  { type: "crash_clock", label: "The Crash Clock: SOL Countdown", path: "/tools/crash-clock" },
-  { type: "injury_predictor", label: "Crash Anatomy Injury Predictor", path: "/tools/injury-predictor" },
-  { type: "adjuster_simulator", label: "AI Adjuster Roleplay Simulator", path: "/tools/adjuster-simulator" },
-  { type: "case_index", label: "Anonymous Case Index", path: "/community/case-index" },
-  { type: "lifestyle_calculator", label: "Lifestyle Cost Calculator", path: "/tools/lifestyle-cost" },
-  { type: "other", label: "Custom Experiment", path: "/tools/custom" },
-];
+const QUIZ_URL = 'https://quiz.accidentcompensationhelper.com/s/eval';
+const blank = {
+  title: '', slug: '', path: '', experiment_type: 'tool', category: '', status: 'draft',
+  build_status: 'planned', hero_headline: '', hero_subheadline: '', short_description: '',
+  primary_cta_url: QUIZ_URL, primary_cta_text: 'Check my claim', disclaimer_short: '',
+  utm_medium_label: '', view_count: 0, clicks: 0, leads: 0,
+};
+
+const rate = (n, d) => (d ? `${Math.round((n / d) * 100)}%` : null);
 
 export default function ExperimentEditor() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const isNew = !id || id === "new";
-  const [form, setForm] = useState({
-    title: "", slug: "", path: "", experiment_type: "other", category: "",
-    status: "draft", build_status: "planned",
-    hero_headline: "", hero_subheadline: "", short_description: "",
-    primary_cta_url: "https://quiz.accidentcompensationhelper.com/s/eval",
-    primary_cta_text: "Start My Free Claim Check",
-    disclaimer_short: "This is an educational tool only, not legal advice and not a guarantee of any specific outcome.",
-    utm_medium_label: "", view_count: 0, clicks: 0, leads: 0,
-  });
+  const [item, setItem] = useState(id ? null : { ...blank });
+  const [tab, setTab] = useState('content');
   const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(!isNew);
+  const [notice, setNotice] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   useEffect(() => {
-    if (isNew) return;
-    base44.entities.Experiment.get(id).then((e) => { setForm((f) => ({ ...f, ...e })); setLoading(false); }).catch(() => setLoading(false));
-  }, [id, isNew]);
+    if (!id) return;
+    base44.entities.Experiment.list('-created_date', 300)
+      .then((rows) => setItem((rows || []).find((r) => r.id === id) || { ...blank }))
+      .catch(() => setItem({ ...blank }));
+  }, [id]);
 
-  const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+  const flags = item ? checkFields({
+    Headline: item.hero_headline, Subheadline: item.hero_subheadline,
+    Description: item.short_description, 'CTA text': item.primary_cta_text,
+  }) : [];
+  const publishBlocked = flags.length > 0;
 
-  const save = async () => {
+  const save = async (overrideStatus) => {
+    const nextStatus = overrideStatus || item.status;
+    if (nextStatus === 'published' && publishBlocked) {
+      setNotice('Publishing is blocked while compliance flags remain.');
+      setTab('compliance');
+      return;
+    }
     setSaving(true);
     try {
-      if (isNew) {
-        const created = await base44.entities.Experiment.create(form);
-        navigate(`/admin/experiments/${created.id}/edit`);
-      } else {
-        await base44.entities.Experiment.update(id, form);
+      const slug = item.slug || slugify(item.title);
+      const payload = { ...item, status: nextStatus, slug, path: item.path || `/tools/${slug}` };
+      if (item.id) await base44.entities.Experiment.update(item.id, payload);
+      else {
+        const created = await base44.entities.Experiment.create(payload);
+        navigate(`/admin/experiments/${created.id}/edit`, { replace: true });
       }
-    } finally { setSaving(false); }
+      setNotice('Saved.');
+      setTimeout(() => setNotice(null), 2000);
+    } catch (e) { setNotice(`Save failed: ${e?.message || String(e)}`); }
+    setSaving(false);
   };
 
-  if (loading) return <AdminLayout title="Loading..."><div className="h-64 animate-pulse rounded-xl bg-white/5" /></AdminLayout>;
+  const doDelete = async () => {
+    await base44.entities.Experiment.delete(item.id);
+    navigate('/admin/experiments');
+  };
+
+  if (!item) return <AdminLayout><PageHeader title="Experiment" /></AdminLayout>;
 
   return (
-    <AdminLayout title={isNew ? "New Experiment" : "Edit Experiment"} breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Experiments", href: "/admin/experiments" }, { label: isNew ? "New" : "Edit" }]}>
-      <div className="mb-6 flex items-center justify-between">
-        <Link to="/admin/experiments" className="inline-flex items-center gap-2 text-sm text-admuted hover:text-white"><ArrowLeft className="h-4 w-4" /> Back to experiments</Link>
-        <div className="flex items-center gap-3">
-          <LegacyPill tone={form.status === "published" ? "success" : "neutral"}>{form.status}</LegacyPill>
-          <AdminButton onClick={save} disabled={saving}><Save className="h-4 w-4" /> {saving ? "Saving..." : "Save"}</AdminButton>
-        </div>
+    <AdminLayout>
+      <PageHeader title={item.id ? item.title || 'Edit experiment' : 'New experiment'}
+        description={item.path || 'Not yet routed'}
+        actions={<>
+          <Button variant="secondary" icon={ArrowLeft} onClick={() => navigate('/admin/experiments')}>Back</Button>
+          {item.id && <Button variant="danger" icon={Trash2} onClick={() => setConfirmDelete(true)}>Delete</Button>}
+          <Button variant="secondary" loading={saving} onClick={() => save('draft')}>Save draft</Button>
+          <Button variant="gold" icon={Save} loading={saving} disabled={publishBlocked}
+            disabledReason={publishBlocked ? `${flags.length} compliance flag(s) must be cleared before publishing` : undefined}
+            onClick={() => save('published')}>Publish</Button>
+        </>} />
+
+      {notice && (
+        <div className="mb-4 rounded-lg px-4 py-2.5 text-sm" style={{ background: '#122430', border: '1px solid rgba(148,180,190,0.26)', color: '#E8F1EF' }}>{notice}</div>
+      )}
+
+      <Tabs tabs={[
+        { label: 'Content', value: 'content' },
+        { label: 'Routing & CTA', value: 'routing' },
+        { label: 'Performance', value: 'performance' },
+        { label: 'Compliance', value: 'compliance', count: flags.length },
+      ]} value={tab} onChange={setTab} />
+
+      <div className="mt-4 max-w-3xl">
+        {tab === 'content' && (
+          <Panel>
+            <div className="space-y-4">
+              <TextInput label="Title" value={item.title} onChange={(e) => setItem({ ...item, title: e.target.value })} />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <TextInput label="Category" value={item.category} onChange={(e) => setItem({ ...item, category: e.target.value })} />
+                <SelectInput label="Type" value={item.experiment_type} options={['tool', 'calculator', 'checker', 'quiz', 'community']}
+                  onChange={(e) => setItem({ ...item, experiment_type: e.target.value })} />
+              </div>
+              <TextInput label="Hero headline" value={item.hero_headline} onChange={(e) => setItem({ ...item, hero_headline: e.target.value })} />
+              <TextInput label="Hero subheadline" value={item.hero_subheadline} onChange={(e) => setItem({ ...item, hero_subheadline: e.target.value })} />
+              <TextArea label="Short description" rows={3} value={item.short_description} onChange={(e) => setItem({ ...item, short_description: e.target.value })} />
+              <TextArea label="Short disclaimer" rows={2} hint="Shown near the CTA. Use this to make clear the tool is informational only."
+                value={item.disclaimer_short} onChange={(e) => setItem({ ...item, disclaimer_short: e.target.value })} />
+            </div>
+          </Panel>
+        )}
+
+        {tab === 'routing' && (
+          <Panel>
+            <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <TextInput label="Slug" hint="Generated from the title if left blank" value={item.slug} onChange={(e) => setItem({ ...item, slug: e.target.value })} />
+                <TextInput label="Path" hint="e.g. /tools/claim-estimator" value={item.path} onChange={(e) => setItem({ ...item, path: e.target.value })} />
+              </div>
+              <SelectInput label="Build status" value={item.build_status} options={['planned', 'in_progress', 'beta', 'live']}
+                onChange={(e) => setItem({ ...item, build_status: e.target.value })} />
+              <TextInput label="Primary CTA text" value={item.primary_cta_text} onChange={(e) => setItem({ ...item, primary_cta_text: e.target.value })} />
+              <TextInput label="Primary CTA URL" value={item.primary_cta_url} onChange={(e) => setItem({ ...item, primary_cta_url: e.target.value })} />
+              <TextInput label="UTM medium label" hint="Distinguishes this tool's traffic in reporting"
+                value={item.utm_medium_label} onChange={(e) => setItem({ ...item, utm_medium_label: e.target.value })} />
+            </div>
+          </Panel>
+        )}
+
+        {tab === 'performance' && (
+          <Panel>
+            <FieldRow label="Status" value={<StatusBadge status={item.status} />} />
+            <FieldRow label="Build status" value={<StatusBadge status={item.build_status} />} />
+            <FieldRow label="Views" value={item.view_count ?? 0} />
+            <FieldRow label="CTA clicks" value={item.clicks ?? 0} />
+            <FieldRow label="Click-through rate" value={rate(item.clicks, item.view_count) || 'not tracked'} />
+            <FieldRow label="Leads" value={item.leads ?? 0} />
+            <FieldRow label="Click → lead" value={rate(item.leads, item.clicks) || 'not tracked'} />
+          </Panel>
+        )}
+
+        {tab === 'compliance' && (
+          <div className="space-y-3">
+            {flags.length === 0 ? (
+              <div className="flex items-start gap-3 rounded-xl p-4" style={{ background: 'rgba(63,185,80,0.12)', border: '1px solid rgba(63,185,80,0.3)' }}>
+                <ShieldCheck className="mt-0.5 h-4 w-4 flex-shrink-0" style={{ color: '#3FB950' }} />
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: '#3FB950' }}>No compliance issues found</p>
+                  <p className="mt-1 text-sm" style={{ color: '#93AAB2' }}>Checked headline, subheadline, description and CTA text.</p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="flex items-start gap-3 rounded-xl p-4" style={{ background: 'rgba(229,83,75,0.12)', border: '1px solid rgba(229,83,75,0.3)' }}>
+                  <ShieldAlert className="mt-0.5 h-4 w-4 flex-shrink-0" style={{ color: '#E5534B' }} />
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: '#E5534B' }}>Publishing is blocked</p>
+                    <p className="mt-1 text-sm" style={{ color: '#93AAB2' }}>A tool that estimates or implies a claim's value is the highest-risk copy on the site.</p>
+                  </div>
+                </div>
+                {flags.map((f, i) => (
+                  <Panel key={i}>
+                    <div className="text-sm font-semibold" style={{ color: '#E5534B' }}>{f.field}: “{f.phrase}”</div>
+                    <p className="mt-2 text-sm" style={{ color: '#93AAB2' }}>{f.reason}</p>
+                  </Panel>
+                ))}
+              </>
+            )}
+          </div>
+        )}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
-          <Card>
-            <h3 className="mb-4 text-sm font-semibold text-white">Content</h3>
-            <div className="space-y-4">
-              <Field label="Title"><AdminInput value={form.title} onChange={(e) => set("title", e.target.value)} placeholder="AI Claim Estimator" /></Field>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Slug"><AdminInput value={form.slug} onChange={(e) => set("slug", e.target.value)} placeholder="claim-estimator" /></Field>
-                <Field label="Path"><AdminInput value={form.path} onChange={(e) => set("path", e.target.value)} placeholder="/tools/claim-estimator" /></Field>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Experiment type">
-                  <select value={form.experiment_type} onChange={(e) => set("experiment_type", e.target.value)} className="w-full rounded-lg border border-navyline bg-navy/60 px-3 py-2 text-sm text-white outline-none focus:border-brand">
-                    {TEMPLATES.map((t) => <option key={t.type} value={t.type}>{t.label}</option>)}
-                  </select>
-                </Field>
-                <Field label="Category"><AdminInput value={form.category} onChange={(e) => set("category", e.target.value)} placeholder="Estimator" /></Field>
-              </div>
-              <Field label="Hero headline"><AdminInput value={form.hero_headline} onChange={(e) => set("hero_headline", e.target.value)} placeholder="What is Your Case Actually Worth?" /></Field>
-              <Field label="Hero subheadline"><textarea rows={2} value={form.hero_subheadline} onChange={(e) => set("hero_subheadline", e.target.value)} className="w-full rounded-lg border border-navyline bg-navy/60 px-3 py-2 text-sm text-white outline-none focus:border-brand" /></Field>
-              <Field label="Short description"><textarea rows={2} value={form.short_description} onChange={(e) => set("short_description", e.target.value)} className="w-full rounded-lg border border-navyline bg-navy/60 px-3 py-2 text-sm text-white outline-none focus:border-brand" /></Field>
-              <Field label="Disclaimer"><textarea rows={2} value={form.disclaimer_short} onChange={(e) => set("disclaimer_short", e.target.value)} className="w-full rounded-lg border border-navyline bg-navy/60 px-3 py-2 text-sm text-white outline-none focus:border-brand" /></Field>
-            </div>
-          </Card>
-        </div>
-
-        <div className="space-y-6">
-          <Card>
-            <h3 className="mb-4 text-sm font-semibold text-white">Status</h3>
-            <div className="space-y-4">
-              <Field label="Status">
-                <select value={form.status} onChange={(e) => set("status", e.target.value)} className="w-full rounded-lg border border-navyline bg-navy/60 px-3 py-2 text-sm text-white outline-none focus:border-brand">
-                  <option value="draft">draft</option><option value="published">published</option><option value="archived">archived</option>
-                </select>
-              </Field>
-              <Field label="Build status">
-                <select value={form.build_status} onChange={(e) => set("build_status", e.target.value)} className="w-full rounded-lg border border-navyline bg-navy/60 px-3 py-2 text-sm text-white outline-none focus:border-brand">
-                  <option value="planned">planned</option><option value="in_progress">in_progress</option><option value="beta">beta</option><option value="live">live</option>
-                </select>
-              </Field>
-            </div>
-          </Card>
-          <Card>
-            <h3 className="mb-4 text-sm font-semibold text-white">Call to action</h3>
-            <div className="space-y-4">
-              <Field label="CTA text"><AdminInput value={form.primary_cta_text} onChange={(e) => set("primary_cta_text", e.target.value)} /></Field>
-              <Field label="CTA URL"><AdminInput value={form.primary_cta_url} onChange={(e) => set("primary_cta_url", e.target.value)} /></Field>
-              <Field label="UTM medium label"><AdminInput value={form.utm_medium_label} onChange={(e) => set("utm_medium_label", e.target.value)} placeholder="claim-estimator" /></Field>
-            </div>
-          </Card>
-          <Card>
-            <h3 className="mb-4 text-sm font-semibold text-white">Metrics</h3>
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div><div className="text-xl font-bold text-white">{form.view_count || 0}</div><div className="text-xs text-admuted">Views</div></div>
-              <div><div className="text-xl font-bold text-white">{form.clicks || 0}</div><div className="text-xs text-admuted">Clicks</div></div>
-              <div><div className="text-xl font-bold text-white">{form.leads || 0}</div><div className="text-xs text-admuted">Leads</div></div>
-            </div>
-          </Card>
-        </div>
-      </div>
+      <ConfirmDialog open={confirmDelete} onClose={() => setConfirmDelete(false)} onConfirm={doDelete}
+        consequence={`"${item.title}" will be permanently deleted. Any traffic pointed at ${item.path} will start hitting a 404.`} />
     </AdminLayout>
   );
 }
