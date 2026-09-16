@@ -70,7 +70,7 @@ export default function SurveyPage() {
     if (survey?.id) {
       base44.entities.Survey.update(survey.id, { responses: (survey.responses || 0) + 1 }).catch(() => {});
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+     
   }, [survey?.id]);
 
   const visible = useMemo(
