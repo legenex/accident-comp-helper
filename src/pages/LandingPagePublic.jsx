@@ -11,10 +11,25 @@ export default function LandingPagePublic() {
 
   useEffect(() => {
     base44.entities.LandingPage.filter({ slug, status: "published" }, "-created_date", 1)
-      .then((r) => setItem((r ?? [])[0] ?? null))
+      .then((r) => {
+        const found = (r ?? [])[0] ?? null;
+        setItem(found);
+        // Count the view. Best-effort: a failed counter never breaks the page.
+        if (found) {
+          base44.entities.LandingPage.update(found.id, { views: (found.views || 0) + 1 }).catch(() => {});
+        }
+      })
       .catch(() => setItem(null))
       .finally(() => setLoading(false));
   }, [slug]);
+
+  // Records the CTA click before following the link, so the admin
+  // click-through and click-to-lead figures have a real source.
+  const trackClick = () => {
+    if (!item) return;
+    setItem((prev) => (prev ? { ...prev, clicks: (prev.clicks || 0) + 1 } : prev));
+    base44.entities.LandingPage.update(item.id, { clicks: (item.clicks || 0) + 1 }).catch(() => {});
+  };
 
   if (loading) return <div className="flex min-h-screen items-center justify-center bg-navy"><div className="h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-brand" /></div>;
   if (!item) return (
@@ -33,7 +48,7 @@ export default function LandingPagePublic() {
           <Link to="/" className="inline-flex items-center gap-2 text-sm text-white/60 hover:text-white"><ArrowLeft className="h-4 w-4" /> Back to home</Link>
           <h1 className="mt-6 font-heading text-4xl font-extrabold tracking-tight sm:text-5xl">{item.headline || item.title}</h1>
           {item.subheadline && <p className="mt-5 text-lg text-white/75">{item.subheadline}</p>}
-          <a href={cta} target="_blank" rel="noopener noreferrer" className="mt-8 inline-flex items-center gap-2 rounded-full bg-brand px-7 py-4 text-base font-semibold text-white shadow-lift transition-transform hover:scale-[1.03] hover:bg-brand-hover">
+          <a href={cta} onClick={trackClick} target="_blank" rel="noopener noreferrer" className="mt-8 inline-flex items-center gap-2 rounded-full bg-brand px-7 py-4 text-base font-semibold text-white shadow-lift transition-transform hover:scale-[1.03] hover:bg-brand-hover">
             {item.cta_text || "Check My Claim"} <ArrowRight className="h-4 w-4" />
           </a>
         </div>
@@ -46,7 +61,7 @@ export default function LandingPagePublic() {
         </section>
       )}
       <section className="bg-navy py-16 text-center text-white">
-        <a href={cta} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-brand px-7 py-4 text-base font-semibold text-white shadow-lift transition-transform hover:scale-[1.03] hover:bg-brand-hover">
+        <a href={cta} onClick={trackClick} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-brand px-7 py-4 text-base font-semibold text-white shadow-lift transition-transform hover:scale-[1.03] hover:bg-brand-hover">
           {item.cta_text || "Check My Claim"} <ArrowRight className="h-4 w-4" />
         </a>
       </section>
