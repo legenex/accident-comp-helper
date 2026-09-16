@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import AdminLayout from '@/components/admin/AdminLayout';
 import {
-  PageHeader, Panel, Button, TextInput, TextArea, SelectInput, Tabs,
-  SectionTitle, FieldRow, StatusBadge, ConfirmDialog,
+  PageHeader, Panel, Button, TextInput, TextArea, SelectInput, Tabs, FieldRow, StatusBadge, ConfirmDialog,
 } from '@/components/admin/ui';
 import { base44 } from '@/api/base44Client';
 import { Save, ArrowLeft, Trash2, ShieldAlert, ShieldCheck } from 'lucide-react';
