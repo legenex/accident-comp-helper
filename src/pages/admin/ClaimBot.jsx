@@ -51,6 +51,7 @@ export default function BotAdmin() {
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
   const [testError, setTestError] = useState(null);
+  const [testNotConfigured, setTestNotConfigured] = useState(false);
   const scrollRef = useRef(null);
 
   const load = async () => {
@@ -92,20 +93,21 @@ export default function BotAdmin() {
     const history = [...messages, userMessage];
     setMessages(history); setInput(''); setSending(true); setTestError(null);
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 1000,
-          system: buildSystemPrompt(config, assignedKnowledge),
-          messages: history.map((m) => ({ role: m.role, content: m.content })),
-        }),
+      // Goes through the botChat backend function, exactly like the public
+      // widget — so the console exercises the real system prompt, the real
+      // assigned knowledge and the real credential path, rather than a
+      // friendlier stand-in. persist is false: test chats are never logged.
+      const res = await base44.functions.invoke('botChat', {
+        messages: history.map((m) => ({ role: m.role, content: m.content })),
+        persist: false,
       });
-      const data = await res.json();
-      const text = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('\n');
-      if (!text) throw new Error(data?.error?.message || 'The model returned no text.');
-      setMessages([...history, { role: 'assistant', content: text }]);
+      const payload = res?.data || res;
+      if (payload?.ok === false) {
+        setTestNotConfigured(!!payload.not_configured);
+        throw new Error(payload.error || 'The request failed.');
+      }
+      setTestNotConfigured(false);
+      setMessages([...history, { role: 'assistant', content: payload.reply }]);
     } catch (e) {
       setTestError(e?.message || String(e));
     }
