@@ -2,6 +2,7 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import PublicNav from "./PublicNav";
 import PublicFooter from "./PublicFooter";
+import BotWidget from "./BotWidget";
 
 export default function PublicLayout() {
   return (
@@ -11,6 +12,7 @@ export default function PublicLayout() {
         <Outlet />
       </main>
       <PublicFooter />
+      <BotWidget />
     </div>
   );
 }
