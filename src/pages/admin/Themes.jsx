@@ -1,99 +1,177 @@
-import React, { useState, useEffect } from "react";
-import AdminLayout from "@/components/admin/AdminLayout";
-import { Card, LegacyPill, AdminButton, SearchBar, LegacyEmptyState, LegacyModal, Field, AdminInput } from "@/components/admin/ui";
-import { base44 } from "@/api/base44Client";
-import { Plus, Edit, Trash2, Palette, Copy } from "lucide-react";
+import React, { useState, useEffect } from 'react';
+import AdminLayout from '@/components/admin/AdminLayout';
+import {
+  PageHeader, Panel, Button, TextInput, TextArea, SearchInput, DataTable,
+  StatusBadge, Modal, ConfirmDialog, EmptyState, Pill, SectionTitle,
+} from '@/components/admin/ui';
+import { base44 } from '@/api/base44Client';
+import { Plus, Edit, Trash2, Palette, Copy, CheckCircle2 } from 'lucide-react';
+import { slugify } from '@/lib/compliance';
 
-const blank = { name: "", slug: "", status: "draft", description: "", config: {} };
+const blank = {
+  name: '', slug: '', status: 'draft', description: '',
+  config: { brand: '#028CC9', brandHover: '#2FA8DE', navy: '#0A1F2C', accent: '#D6A23C' },
+};
+
+const SWATCHES = [
+  { key: 'brand', label: 'Brand / primary action' },
+  { key: 'brandHover', label: 'Brand hover' },
+  { key: 'navy', label: 'Dark surface' },
+  { key: 'accent', label: 'Accent' },
+];
 
 export default function Themes() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
+  const [error, setError] = useState(null);
+  const [search, setSearch] = useState('');
   const [editing, setEditing] = useState(null);
-  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [notice, setNotice] = useState(null);
 
-  const fetchList = async () => {
-    setLoading(true);
-    try { setRows((await base44.entities.Theme.list("-created_date", 200)) ?? []); } catch { setRows([]); }
+  const load = async () => {
+    setLoading(true); setError(null);
+    try { setRows((await base44.entities.Theme.list('-created_date', 200)) || []); }
+    catch (e) { setError(e?.message || 'Failed to load themes'); }
     setLoading(false);
   };
-  useEffect(() => { fetchList(); }, []);
+  useEffect(() => { load(); }, []);
 
-  const filtered = rows.filter((t) => !search || t.name?.toLowerCase().includes(search.toLowerCase()) || t.slug?.toLowerCase().includes(search.toLowerCase()));
+  const filtered = rows.filter((t) => !search
+    || t.name?.toLowerCase().includes(search.toLowerCase())
+    || t.slug?.toLowerCase().includes(search.toLowerCase()));
+
+  const activeTheme = rows.find((t) => t.status === 'active');
 
   const save = async () => {
-    if (editing.id) await base44.entities.Theme.update(editing.id, editing);
-    else await base44.entities.Theme.create(editing);
-    setEditing(null); fetchList();
+    setSaving(true);
+    try {
+      const payload = { ...editing, slug: editing.slug || slugify(editing.name) };
+      if (editing.id) await base44.entities.Theme.update(editing.id, payload);
+      else await base44.entities.Theme.create(payload);
+      setEditing(null); load();
+    } finally { setSaving(false); }
   };
+
+  // Exactly one theme can be active. Activating one stands the others down,
+  // rather than leaving several claiming to be live.
+  const activate = async (theme) => {
+    setNotice(null);
+    try {
+      for (const other of rows.filter((t) => t.status === 'active' && t.id !== theme.id)) {
+        await base44.entities.Theme.update(other.id, { status: 'draft' });
+      }
+      await base44.entities.Theme.update(theme.id, { status: 'active' });
+      setNotice(`"${theme.name}" is now the active theme.`);
+      load();
+    } catch (e) { setNotice(`Could not activate: ${e?.message || String(e)}`); }
+  };
+
   const duplicate = async (t) => {
-    const copy = { ...t, name: `${t.name} (Copy)`, slug: `${t.slug}-copy-${Date.now()}`, status: "draft" };
-    delete copy.id; delete copy.created_date; delete copy.updated_date;
-    await base44.entities.Theme.create(copy); fetchList();
+    const { id: _id, created_date: _c, updated_date: _u, ...rest } = t;
+    await base44.entities.Theme.create({ ...rest, name: `${t.name} (copy)`, slug: `${t.slug}-copy`, status: 'draft' });
+    load();
   };
-  const remove = async (id) => { await base44.entities.Theme.delete(id); setRows((p) => p.filter((x) => x.id !== id)); setDeleteConfirm(null); };
-  const activate = async (t) => {
-    await base44.entities.Theme.updateMany({ status: "active" }, { $set: { status: "draft" } });
-    await base44.entities.Theme.update(t.id, { status: "active" });
-    fetchList();
-  };
+
+  const confirmDelete = async () => { await base44.entities.Theme.delete(deleteTarget.id); setDeleteTarget(null); load(); };
+
+  const setColor = (key, value) => setEditing({ ...editing, config: { ...(editing.config || {}), [key]: value } });
 
   return (
-    <AdminLayout title="Themes" breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Themes" }]}>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div><h2 className="text-2xl font-bold text-white">Themes</h2><p className="mt-1 text-sm text-admuted">{rows.length} themes</p></div>
-        <AdminButton onClick={() => setEditing({ ...blank })}><Plus className="h-4 w-4" /> New Theme</AdminButton>
-      </div>
-      <Card className="mb-6"><SearchBar value={search} onChange={setSearch} placeholder="Search themes..." /></Card>
-      {loading ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-40 animate-pulse rounded-xl bg-white/5" />)}</div>
-      ) : filtered.length === 0 ? (
-        <LegacyEmptyState icon={Palette} title="No themes yet" body="Create a theme to style your public pages." action={<AdminButton onClick={() => setEditing({ ...blank })}><Plus className="h-4 w-4" /> New Theme</AdminButton>} />
-      ) : (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((t) => (
-            <Card key={t.id} className="flex flex-col">
-              <div className="mb-3 flex items-center justify-between">
-                <h3 className="font-heading text-base font-bold text-white">{t.name}</h3>
-                <LegacyPill tone={t.status === "active" ? "success" : "neutral"}>{t.status}</LegacyPill>
-              </div>
-              <p className="flex-1 text-sm text-admuted">{t.description || "No description."}</p>
-              <div className="mt-4 flex items-center gap-2">
-                <div className="flex gap-1.5">
-                  <span className="h-5 w-5 rounded bg-brand" title="Brand" />
-                  <span className="h-5 w-5 rounded bg-navy" title="Navy" />
-                  <span className="h-5 w-5 rounded bg-white border border-navyline" title="Light" />
-                </div>
-                <div className="ml-auto flex items-center gap-1.5">
-                  {t.status !== "active" && <button onClick={() => activate(t)} className="rounded px-2 py-1 text-xs font-semibold text-brand hover:bg-brand/10">Activate</button>}
-                  <button onClick={() => setEditing(t)} className="rounded p-1.5 text-admuted hover:bg-white/10 hover:text-white"><Edit className="h-4 w-4" /></button>
-                  <button onClick={() => duplicate(t)} className="rounded p-1.5 text-admuted hover:bg-white/10 hover:text-white"><Copy className="h-4 w-4" /></button>
-                  <button onClick={() => setDeleteConfirm(t)} className="rounded p-1.5 text-admuted hover:bg-white/10 hover:text-destructive"><Trash2 className="h-4 w-4" /></button>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
+    <AdminLayout>
+      <PageHeader title="Themes" description={activeTheme ? `Active theme: ${activeTheme.name}` : 'No theme is currently active — the site is using its built-in defaults.'}
+        actions={<Button variant="gold" icon={Plus} onClick={() => setEditing({ ...blank })}>New Theme</Button>} />
+
+      {notice && (
+        <div className="mb-4 rounded-lg px-4 py-2.5 text-sm" style={{ background: '#122430', border: '1px solid rgba(148,180,190,0.26)', color: '#E8F1EF' }}>{notice}</div>
       )}
 
-      <LegacyModal open={!!editing} onClose={() => setEditing(null)} title={editing?.id ? "Edit Theme" : "New Theme"} wide>
+      <Panel padded={false}>
+        <div className="p-4"><SearchInput value={search} onChange={setSearch} placeholder="Search themes..." /></div>
+        <DataTable
+          loading={loading} error={error} onRetry={load} rows={filtered} onRowClick={setEditing}
+          empty={<div className="p-4"><EmptyState icon={Palette} title="No themes yet"
+            description="Define a colour set you can switch the public site to without a code change."
+            action={<Button variant="gold" icon={Plus} onClick={() => setEditing({ ...blank })}>New Theme</Button>} /></div>}
+          columns={[
+            { key: 'name', header: 'Name' },
+            { key: 'slug', header: 'Slug', render: (t) => <Pill>{t.slug}</Pill> },
+            {
+              key: 'colors', header: 'Colours',
+              render: (t) => (
+                <div className="flex gap-1">
+                  {SWATCHES.map((s) => (
+                    <span key={s.key} title={`${s.label}: ${t.config?.[s.key] || 'unset'}`}
+                      className="h-4 w-4 rounded" style={{ background: t.config?.[s.key] || 'transparent', border: '1px solid rgba(148,180,190,0.26)' }} />
+                  ))}
+                </div>
+              ),
+            },
+            { key: 'status', header: 'Status', render: (t) => <StatusBadge status={t.status} /> },
+            {
+              key: 'actions', header: '', className: 'text-right',
+              render: (t) => (
+                <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+                  <Button variant="ghost" size="sm" icon={CheckCircle2} title={t.status === 'active' ? 'Already active' : 'Make active'}
+                    disabled={t.status === 'active'} disabledReason="This is already the active theme"
+                    onClick={() => activate(t)} />
+                  <Button variant="ghost" size="sm" icon={Copy} title="Duplicate" onClick={() => duplicate(t)} />
+                  <Button variant="ghost" size="sm" icon={Edit} title="Edit" onClick={() => setEditing(t)} />
+                  <Button variant="ghost" size="sm" icon={Trash2} title="Delete" onClick={() => setDeleteTarget(t)} />
+                </div>
+              ),
+            },
+          ]}
+        />
+      </Panel>
+
+      <Modal open={!!editing} onClose={() => setEditing(null)} title={editing?.id ? 'Edit theme' : 'New theme'} wide
+        footer={<><Button variant="secondary" onClick={() => setEditing(null)}>Cancel</Button><Button variant="gold" loading={saving} onClick={save}>Save</Button></>}>
         {editing && (
           <div className="space-y-4">
-            <Field label="Name"><AdminInput value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} /></Field>
             <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Slug"><AdminInput value={editing.slug} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} /></Field>
-              <Field label="Status"><select value={editing.status} onChange={(e) => setEditing({ ...editing, status: e.target.value })} className="w-full rounded-lg border border-navyline bg-navy/60 px-3 py-2 text-sm text-white outline-none focus:border-brand"><option value="draft">draft</option><option value="active">active</option><option value="archived">archived</option></select></Field>
+              <TextInput label="Name" value={editing.name} onChange={(e) => setEditing({ ...editing, name: e.target.value })} />
+              <TextInput label="Slug" hint="Generated from the name if left blank" value={editing.slug} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} />
             </div>
-            <Field label="Description"><textarea rows={3} value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })} className="w-full rounded-lg border border-navyline bg-navy/60 px-3 py-2 text-sm text-white outline-none focus:border-brand" /></Field>
-            <div className="flex justify-end gap-3 pt-2"><AdminButton variant="secondary" onClick={() => setEditing(null)}>Cancel</AdminButton><AdminButton onClick={save}>Save</AdminButton></div>
+            <TextArea label="Description" rows={2} value={editing.description} onChange={(e) => setEditing({ ...editing, description: e.target.value })} />
+
+            <div>
+              <SectionTitle>Colours</SectionTitle>
+              <div className="space-y-3">
+                {SWATCHES.map((s) => (
+                  <div key={s.key} className="flex items-center gap-3">
+                    <input type="color" value={editing.config?.[s.key] || '#000000'} onChange={(e) => setColor(s.key, e.target.value)}
+                      className="h-9 w-12 flex-shrink-0 cursor-pointer rounded border-0 bg-transparent" title={s.label} />
+                    <div className="min-w-0 flex-1">
+                      <TextInput label={s.label} value={editing.config?.[s.key] || ''} onChange={(e) => setColor(s.key, e.target.value)} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <SectionTitle>Preview</SectionTitle>
+              <Panel>
+                <div className="rounded-xl p-6 text-center" style={{ background: editing.config?.navy || '#0A1F2C' }}>
+                  <h3 className="font-heading text-lg font-bold text-white">Injured in an accident?</h3>
+                  <p className="mt-1.5 text-sm text-white/60">Find out in two minutes whether you may qualify.</p>
+                  <div className="mt-4 inline-block rounded-full px-6 py-2.5 text-sm font-semibold text-white"
+                    style={{ background: editing.config?.brand || '#028CC9' }}>
+                    Check my claim
+                  </div>
+                </div>
+              </Panel>
+            </div>
           </div>
         )}
-      </LegacyModal>
-      <LegacyModal open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete theme?">
-        <p className="text-sm text-slate-300">Delete "{deleteConfirm?.name}"? This cannot be undone.</p>
-        <div className="mt-6 flex justify-end gap-3"><AdminButton variant="secondary" onClick={() => setDeleteConfirm(null)}>Cancel</AdminButton><AdminButton variant="danger" onClick={() => remove(deleteConfirm.id)}><Trash2 className="h-4 w-4" /> Delete</AdminButton></div>
-      </LegacyModal>
+      </Modal>
+
+      <ConfirmDialog open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={confirmDelete}
+        consequence={deleteTarget?.status === 'active'
+          ? `"${deleteTarget?.name}" is the ACTIVE theme. Deleting it will drop the site back to its built-in default colours.`
+          : `"${deleteTarget?.name}" will be permanently deleted.`} />
     </AdminLayout>
   );
 }
