@@ -14,28 +14,9 @@ const blankConfig = {
   placement: 'bottom_right', model: 'default', knowledge_base_ids: [], handoff_url: QUIZ_URL,
 };
 
-// The bot must never give legal advice or predict outcomes. This is prepended
-// to every request, including the test console, so the console exercises the
-// same behaviour visitors get rather than a friendlier stand-in.
-function buildSystemPrompt(config, knowledge) {
-  const kb = knowledge.map((k) => `### ${k.title}\n${k.content}`).join('\n\n');
-  return [
-    `You are "${config.display_name || 'Claim Assistant'}", an assistant on Accident Compensation Helper, a free service that helps US accident victims understand whether their situation may be worth discussing with a participating personal injury attorney.`,
-    '',
-    'Hard rules, no exceptions:',
-    '- You are NOT a lawyer and this is NOT a law firm. Never give legal advice.',
-    '- Never predict, guarantee, or estimate the outcome or value of a claim.',
-    '- Never state or imply the person is entitled to money, or that money is waiting for them.',
-    '- Never quote settlement figures, averages, or ranges.',
-    '- Never imply government or insurer affiliation.',
-    '- Do not collect medical detail beyond what is needed to route them.',
-    '- If asked something you cannot answer, say so plainly and offer the claim check.',
-    '',
-    `When someone seems ready to proceed, point them to the free claim check: ${config.handoff_url || QUIZ_URL}`,
-    'Keep replies short, plain, and calm. No hype, no urgency.',
-    kb ? `\nGrounding knowledge (use only this for factual claims):\n${kb}` : '\nNo knowledge base entries are assigned, so stick to general, non-specific guidance.',
-  ].join('\n');
-}
+// NOTE: the system prompt lives server-side in the botChat function, not here.
+// Compliance rules must not be editable from the browser, and the console has
+// to exercise the same prompt the public widget gets.
 
 export default function BotAdmin() {
   const [tab, setTab] = useState('config');
@@ -206,6 +187,12 @@ export default function BotAdmin() {
 
         {tab === 'test' && (
           <div className="max-w-3xl">
+            {testNotConfigured && (
+              <div className="mb-4">
+                <NotConfigured title="The model credential isn't set"
+                  description="ANTHROPIC_API_KEY is not configured for this app, so the bot cannot send messages here or on the public site. Add it in the Base44 environment settings." />
+              </div>
+            )}
             <Panel padded={false}>
               <div ref={scrollRef} className="admin-scroll max-h-[420px] min-h-[240px] space-y-3 overflow-y-auto p-4">
                 {messages.length === 0 ? (
