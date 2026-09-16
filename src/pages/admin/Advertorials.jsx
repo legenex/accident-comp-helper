@@ -1,153 +1,218 @@
-import React, { useState, useEffect } from "react";
-import AdminLayout from "@/components/admin/AdminLayout";
-import { Card, LegacyPill, AdminButton, SearchBar, LegacySelect, LegacyEmptyState, LegacyModal, Field, AdminInput } from "@/components/admin/ui";
-import { base44 } from "@/api/base44Client";
-import { Plus, Edit, Trash2, ExternalLink, Newspaper, ToggleLeft, ToggleRight } from "lucide-react";
+import React, { useEffect, useState } from 'react';
+import AdminLayout from '@/components/admin/AdminLayout';
+import {
+  PageHeader, Panel, Button, TextInput, TextArea, SelectInput, SearchInput, DataTable,
+  StatusBadge, Modal, ConfirmDialog, EmptyState, Tabs, Pill, StatCard, FieldRow,
+} from '@/components/admin/ui';
+import { base44 } from '@/api/base44Client';
+import { Plus, Edit, Trash2, Newspaper, ExternalLink, Copy, Eye, MousePointerClick, Users2, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { checkFields, slugify } from '@/lib/compliance';
 
-const QUIZ = "https://quiz.accidentcompensationhelper.com/s/eval";
-const blank = { title: "", slug: "", status: "draft", headline: "", subheadline: "", body: "", cta_url: QUIZ, cta_text: "Check My Claim", views: 0, clicks: 0, leads: 0 };
+const QUIZ_URL = 'https://quiz.accidentcompensationhelper.com/s/eval';
+const blank = {
+  title: '', slug: '', status: 'draft', headline: '', subheadline: '', body: '',
+  author: '', cta_url: QUIZ_URL, cta_text: 'Check my claim', views: 0, clicks: 0, leads: 0,
+};
+
+const rate = (n, d) => (d ? `${Math.round((n / d) * 100)}%` : null);
 
 export default function Advertorials() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
+  const [error, setError] = useState(null);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
   const [editing, setEditing] = useState(null);
-  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [editorTab, setEditorTab] = useState('content');
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [notice, setNotice] = useState(null);
 
-  const fetchList = async () => {
-    setLoading(true);
-    try { setRows((await base44.entities.Advertorial.list("-created_date", 200)) ?? []); } catch { setRows([]); }
+  const load = async () => {
+    setLoading(true); setError(null);
+    try { setRows((await base44.entities.Advertorial.list('-created_date', 300)) || []); }
+    catch (e) { setError(e?.message || 'Failed to load advertorials'); }
     setLoading(false);
   };
-  useEffect(() => { fetchList(); }, []);
+  useEffect(() => { load(); }, []);
 
-  const filtered = rows.filter((a) => {
-    const ms = !search || a.title?.toLowerCase().includes(search.toLowerCase()) || a.slug?.toLowerCase().includes(search.toLowerCase());
-    const mst = statusFilter === "All" || a.status === statusFilter.toLowerCase();
-    return ms && mst;
+  const filtered = rows.filter((r) => {
+    const q = search.toLowerCase();
+    const matchesSearch = !q || r.title?.toLowerCase().includes(q) || r.slug?.toLowerCase().includes(q);
+    const matchesStatus = statusFilter === 'All' || r.status === statusFilter;
+    return matchesSearch && matchesStatus;
   });
 
-  const save = async () => {
-    if (editing.id) {
-      await base44.entities.Advertorial.update(editing.id, editing);
-    } else {
-      await base44.entities.Advertorial.create(editing);
+  const totals = rows.reduce((a, r) => ({
+    views: a.views + (r.views || 0), clicks: a.clicks + (r.clicks || 0), leads: a.leads + (r.leads || 0),
+  }), { views: 0, clicks: 0, leads: 0 });
+
+  // Advertorials carry the heaviest advertising risk of any page type here,
+  // because they read like editorial. Same gate as the blog and landers.
+  const flags = editing ? checkFields({
+    Headline: editing.headline, Subheadline: editing.subheadline, Body: editing.body, 'CTA text': editing.cta_text,
+  }) : [];
+  const publishBlocked = flags.length > 0;
+
+  const save = async (overrideStatus) => {
+    const nextStatus = overrideStatus || editing.status;
+    if (nextStatus === 'published' && publishBlocked) {
+      setNotice('Publishing is blocked while compliance flags remain.');
+      setEditorTab('compliance');
+      return;
     }
-    setEditing(null);
-    fetchList();
+    setSaving(true);
+    try {
+      const payload = { ...editing, status: nextStatus, slug: editing.slug || slugify(editing.title) };
+      if (editing.id) await base44.entities.Advertorial.update(editing.id, payload);
+      else await base44.entities.Advertorial.create(payload);
+      setEditing(null); setNotice(null); load();
+    } catch (e) { setNotice(`Save failed: ${e?.message || String(e)}`); }
+    setSaving(false);
   };
 
-  const toggle = async (a) => {
-    const next = a.status === "published" ? "draft" : "published";
-    await base44.entities.Advertorial.update(a.id, { status: next });
-    setRows((p) => p.map((x) => (x.id === a.id ? { ...x, status: next } : x)));
+  const duplicate = async (r) => {
+    const { id: _id, created_date: _c, updated_date: _u, ...rest } = r;
+    await base44.entities.Advertorial.create({ ...rest, title: `${r.title} (copy)`, slug: `${r.slug}-copy`, status: 'draft', views: 0, clicks: 0, leads: 0 });
+    load();
   };
-
-  const remove = async (id) => {
-    await base44.entities.Advertorial.delete(id);
-    setRows((p) => p.filter((x) => x.id !== id));
-    setDeleteConfirm(null);
-  };
-
-  const ctr = (a) => (!a.views ? "-" : (((a.clicks || 0) / a.views) * 100).toFixed(2) + "%");
+  const confirmDelete = async () => { await base44.entities.Advertorial.delete(deleteTarget.id); setDeleteTarget(null); load(); };
 
   return (
-    <AdminLayout title="Advertorials" breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Advertorials" }]}>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-white">Advertorials</h2>
-          <p className="mt-1 text-sm text-admuted">{rows.filter((a) => a.status === "published").length} live · {rows.length} total</p>
-        </div>
-        <AdminButton onClick={() => setEditing({ ...blank })}><Plus className="h-4 w-4" /> New Advertorial</AdminButton>
+    <AdminLayout>
+      <PageHeader title="Advertorials" description="Editorial-style acquisition pages. These read like articles, so the advertising rules apply hardest here."
+        actions={<Button variant="gold" icon={Plus} onClick={() => { setEditing({ ...blank }); setEditorTab('content'); }}>New Advertorial</Button>} />
+
+      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatCard label="Total views" value={loading ? '—' : totals.views} icon={Eye} tone="neutral" />
+        <StatCard label="CTA clicks" value={loading ? '—' : totals.clicks} icon={MousePointerClick} tone="brand" />
+        <StatCard label="Leads" value={loading ? '—' : totals.leads} icon={Users2} tone="success" />
+        <StatCard label="Click → lead" value={loading ? '—' : (rate(totals.leads, totals.clicks) || 'not tracked')} tone="neutral" />
       </div>
 
-      <Card className="mb-6 flex flex-wrap items-center gap-3">
-        <SearchBar value={search} onChange={setSearch} placeholder="Search by title or slug..." />
-        <LegacySelect value={statusFilter} onChange={setStatusFilter} options={["All", "published", "draft", "archived"]} />
-      </Card>
+      <Panel padded={false}>
+        <div className="flex flex-wrap items-center gap-3 p-4">
+          <SearchInput value={search} onChange={setSearch} placeholder="Search advertorials..." className="min-w-[220px] flex-1" />
+          <SelectInput value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} options={['All', 'draft', 'published', 'archived']} />
+        </div>
+        <DataTable
+          loading={loading} error={error} onRetry={load} rows={filtered}
+          onRowClick={(r) => { setEditing({ ...blank, ...r }); setEditorTab('content'); }}
+          empty={<div className="p-4"><EmptyState icon={Newspaper} title="No advertorials yet"
+            description="Long-form editorial pages that carry native traffic into the claim check."
+            action={<Button variant="gold" icon={Plus} onClick={() => setEditing({ ...blank })}>New Advertorial</Button>} /></div>}
+          columns={[
+            { key: 'title', header: 'Title' },
+            { key: 'slug', header: 'URL', render: (r) => <Pill>/a/{r.slug}</Pill> },
+            { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
+            { key: 'views', header: 'Views' },
+            { key: 'ctr', header: 'CTR', render: (r) => rate(r.clicks, r.views) },
+            { key: 'leads', header: 'Leads' },
+            {
+              key: 'actions', header: '', className: 'text-right',
+              render: (r) => (
+                <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+                  {r.status === 'published' && <a href={`/a/${r.slug}`} target="_blank" rel="noopener noreferrer"><Button variant="ghost" size="sm" icon={ExternalLink} title="View live" /></a>}
+                  <Button variant="ghost" size="sm" icon={Copy} title="Duplicate" onClick={() => duplicate(r)} />
+                  <Button variant="ghost" size="sm" icon={Edit} title="Edit" onClick={() => { setEditing({ ...blank, ...r }); setEditorTab('content'); }} />
+                  <Button variant="ghost" size="sm" icon={Trash2} title="Delete" onClick={() => setDeleteTarget(r)} />
+                </div>
+              ),
+            },
+          ]}
+        />
+      </Panel>
 
-      <Card className="overflow-x-auto p-0">
-        {loading ? (
-          <div className="space-y-2 p-5">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-12 animate-pulse rounded bg-white/5" />)}</div>
-        ) : filtered.length === 0 ? (
-          <div className="p-5"><LegacyEmptyState icon={Newspaper} title="No advertorials yet" body="Create your first advertorial to start driving leads." action={<AdminButton onClick={() => setEditing({ ...blank })}><Plus className="h-4 w-4" /> New Advertorial</AdminButton>} /></div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/10 text-admuted">
-                <th className="p-3 text-left font-medium">Title / Headline</th>
-                <th className="hidden p-3 text-left font-medium lg:table-cell">Slug</th>
-                <th className="p-3 text-left font-medium">Status</th>
-                <th className="p-3 text-right font-medium">Views</th>
-                <th className="hidden p-3 text-right font-medium sm:table-cell">Clicks</th>
-                <th className="hidden p-3 text-right font-medium sm:table-cell">CTR</th>
-                <th className="hidden p-3 text-right font-medium lg:table-cell">Leads</th>
-                <th className="p-3 text-right font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((a) => (
-                <tr key={a.id} className="border-b border-white/5 hover:bg-white/5">
-                  <td className="p-3">
-                    <button onClick={() => setEditing(a)} className="font-semibold text-white hover:text-brand">{a.title}</button>
-                    {a.headline && <div className="text-xs text-admuted">{a.headline}</div>}
-                  </td>
-                  <td className="hidden p-3 font-mono text-xs text-brand lg:table-cell">/a/{a.slug}</td>
-                  <td className="p-3"><LegacyPill tone={a.status === "published" ? "success" : "neutral"}>{a.status}</LegacyPill></td>
-                  <td className="p-3 text-right text-white">{a.views || 0}</td>
-                  <td className="hidden p-3 text-right text-slate-300 sm:table-cell">{a.clicks || 0}</td>
-                  <td className="hidden p-3 text-right text-slate-300 sm:table-cell">{ctr(a)}</td>
-                  <td className="hidden p-3 text-right text-slate-300 lg:table-cell">{a.leads || 0}</td>
-                  <td className="p-3">
-                    <div className="flex items-center justify-end gap-1.5">
-                      <a href={`/a/${a.slug}`} target="_blank" rel="noopener noreferrer" className="rounded p-1.5 text-admuted hover:bg-white/10 hover:text-white"><ExternalLink className="h-4 w-4" /></a>
-                      <button onClick={() => setEditing(a)} className="rounded p-1.5 text-admuted hover:bg-white/10 hover:text-white"><Edit className="h-4 w-4" /></button>
-                      <button onClick={() => toggle(a)} className="rounded p-1.5 text-admuted hover:bg-white/10 hover:text-white">{a.status === "published" ? <ToggleRight className="h-4 w-4 text-success" /> : <ToggleLeft className="h-4 w-4" />}</button>
-                      <button onClick={() => setDeleteConfirm(a)} className="rounded p-1.5 text-admuted hover:bg-white/10 hover:text-destructive"><Trash2 className="h-4 w-4" /></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </Card>
+      {notice && (
+        <div className="mt-4 rounded-lg px-4 py-2.5 text-sm" style={{ background: 'rgba(214,162,52,0.12)', border: '1px solid rgba(214,162,52,0.4)', color: '#D6A234' }}>{notice}</div>
+      )}
 
-      <LegacyModal open={!!editing} onClose={() => setEditing(null)} title={editing?.id ? "Edit Advertorial" : "New Advertorial"} wide>
+      <Modal open={!!editing} onClose={() => { setEditing(null); setNotice(null); }} title={editing?.id ? 'Edit advertorial' : 'New advertorial'} wide
+        footer={<>
+          <Button variant="secondary" onClick={() => { setEditing(null); setNotice(null); }}>Cancel</Button>
+          <Button variant="secondary" loading={saving} onClick={() => save('draft')}>Save draft</Button>
+          <Button variant="gold" loading={saving} disabled={publishBlocked}
+            disabledReason={publishBlocked ? `${flags.length} compliance flag(s) must be cleared before publishing` : undefined}
+            onClick={() => save('published')}>Publish</Button>
+        </>}>
         {editing && (
-          <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
-            <Field label="Title"><AdminInput value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} /></Field>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Slug"><AdminInput value={editing.slug} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} /></Field>
-              <Field label="Status">
-                <select value={editing.status} onChange={(e) => setEditing({ ...editing, status: e.target.value })} className="w-full rounded-lg border border-navyline bg-navy/60 px-3 py-2 text-sm text-white outline-none focus:border-brand">
-                  <option value="draft">draft</option><option value="published">published</option><option value="archived">archived</option>
-                </select>
-              </Field>
-            </div>
-            <Field label="Headline"><AdminInput value={editing.headline} onChange={(e) => setEditing({ ...editing, headline: e.target.value })} /></Field>
-            <Field label="Subheadline"><textarea rows={2} value={editing.subheadline} onChange={(e) => setEditing({ ...editing, subheadline: e.target.value })} className="w-full rounded-lg border border-navyline bg-navy/60 px-3 py-2 text-sm text-white outline-none focus:border-brand" /></Field>
-            <Field label="Body"><textarea rows={6} value={editing.body} onChange={(e) => setEditing({ ...editing, body: e.target.value })} className="w-full rounded-lg border border-navyline bg-navy/60 px-3 py-2 text-sm text-white outline-none focus:border-brand" /></Field>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="CTA text"><AdminInput value={editing.cta_text} onChange={(e) => setEditing({ ...editing, cta_text: e.target.value })} /></Field>
-              <Field label="CTA URL"><AdminInput value={editing.cta_url} onChange={(e) => setEditing({ ...editing, cta_url: e.target.value })} /></Field>
-            </div>
-            <div className="flex justify-end gap-3 pt-2">
-              <AdminButton variant="secondary" onClick={() => setEditing(null)}>Cancel</AdminButton>
-              <AdminButton onClick={save}>Save</AdminButton>
-            </div>
+          <div className="space-y-4">
+            <Tabs tabs={[
+              { label: 'Content', value: 'content' },
+              { label: 'CTA', value: 'cta' },
+              { label: 'Performance', value: 'performance' },
+              { label: 'Compliance', value: 'compliance', count: flags.length },
+            ]} value={editorTab} onChange={setEditorTab} />
+
+            {editorTab === 'content' && (
+              <div className="space-y-4 pt-2">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <TextInput label="Title" hint="Internal name" value={editing.title} onChange={(e) => setEditing({ ...editing, title: e.target.value })} />
+                  <TextInput label="Slug" hint="Public URL is /a/<slug>" value={editing.slug} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} />
+                </div>
+                <TextInput label="Headline" value={editing.headline} onChange={(e) => setEditing({ ...editing, headline: e.target.value })} />
+                <TextInput label="Subheadline" value={editing.subheadline} onChange={(e) => setEditing({ ...editing, subheadline: e.target.value })} />
+                <TextInput label="Byline / author" value={editing.author} onChange={(e) => setEditing({ ...editing, author: e.target.value })} />
+                <TextArea label="Body (Markdown)" rows={14} value={editing.body} onChange={(e) => setEditing({ ...editing, body: e.target.value })} />
+              </div>
+            )}
+
+            {editorTab === 'cta' && (
+              <div className="space-y-4 pt-2">
+                <TextInput label="CTA text" value={editing.cta_text} onChange={(e) => setEditing({ ...editing, cta_text: e.target.value })} />
+                <TextInput label="CTA URL" value={editing.cta_url} onChange={(e) => setEditing({ ...editing, cta_url: e.target.value })} />
+              </div>
+            )}
+
+            {editorTab === 'performance' && (
+              <div className="pt-2">
+                <FieldRow label="Views" value={editing.views ?? 0} />
+                <FieldRow label="CTA clicks" value={editing.clicks ?? 0} />
+                <FieldRow label="Click-through rate" value={rate(editing.clicks, editing.views) || 'not tracked'} />
+                <FieldRow label="Leads" value={editing.leads ?? 0} />
+                <FieldRow label="Click → lead" value={rate(editing.leads, editing.clicks) || 'not tracked'} />
+              </div>
+            )}
+
+            {editorTab === 'compliance' && (
+              <div className="space-y-3 pt-2">
+                {flags.length === 0 ? (
+                  <div className="flex items-start gap-3 rounded-xl p-4" style={{ background: 'rgba(63,185,80,0.12)', border: '1px solid rgba(63,185,80,0.3)' }}>
+                    <ShieldCheck className="mt-0.5 h-4 w-4 flex-shrink-0" style={{ color: '#3FB950' }} />
+                    <div>
+                      <p className="text-sm font-semibold" style={{ color: '#3FB950' }}>No compliance issues found</p>
+                      <p className="mt-1 text-sm" style={{ color: '#93AAB2' }}>Checked headline, subheadline, body and CTA text.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex items-start gap-3 rounded-xl p-4" style={{ background: 'rgba(229,83,75,0.12)', border: '1px solid rgba(229,83,75,0.3)' }}>
+                      <ShieldAlert className="mt-0.5 h-4 w-4 flex-shrink-0" style={{ color: '#E5534B' }} />
+                      <div>
+                        <p className="text-sm font-semibold" style={{ color: '#E5534B' }}>Publishing is blocked</p>
+                        <p className="mt-1 text-sm" style={{ color: '#93AAB2' }}>Editorial framing does not exempt a page from advertising rules — if anything it raises the bar.</p>
+                      </div>
+                    </div>
+                    {flags.map((f, i) => (
+                      <Panel key={i}>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Pill>{f.field}</Pill>
+                          <span className="text-sm font-semibold" style={{ color: '#E5534B' }}>“{f.phrase}”</span>
+                        </div>
+                        <p className="mt-2 text-sm" style={{ color: '#93AAB2' }}>{f.reason}</p>
+                        {f.context && <p className="mt-1.5 text-xs italic" style={{ color: '#5E7681' }}>{f.context}</p>}
+                      </Panel>
+                    ))}
+                  </>
+                )}
+              </div>
+            )}
           </div>
         )}
-      </LegacyModal>
+      </Modal>
 
-      <LegacyModal open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete advertorial?">
-        <p className="text-sm text-slate-300">Delete "{deleteConfirm?.title}"? This cannot be undone.</p>
-        <div className="mt-6 flex justify-end gap-3">
-          <AdminButton variant="secondary" onClick={() => setDeleteConfirm(null)}>Cancel</AdminButton>
-          <AdminButton variant="danger" onClick={() => remove(deleteConfirm.id)}><Trash2 className="h-4 w-4" /> Delete</AdminButton>
-        </div>
-      </LegacyModal>
+      <ConfirmDialog open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={confirmDelete}
+        consequence={`"${deleteTarget?.title}" will be permanently deleted. Any live native campaign pointing at /a/${deleteTarget?.slug} will start sending paid traffic to a 404.`} />
     </AdminLayout>
   );
 }
