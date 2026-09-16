@@ -1,183 +1,108 @@
-import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import AdminLayout from "@/components/admin/AdminLayout";
-import { Card, LegacyPill, AdminButton, SearchBar, LegacySelect, LegacyEmptyState, LegacyModal } from "@/components/admin/ui";
-import { base44 } from "@/api/base44Client";
-import { Plus, Edit, Trash2, Copy, ExternalLink, ToggleLeft, ToggleRight, Sparkles, Beaker } from "lucide-react";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import AdminLayout from '@/components/admin/AdminLayout';
+import {
+  PageHeader, Panel, Button, SearchInput, SelectInput, DataTable, StatusBadge,
+  ConfirmDialog, EmptyState, Pill, StatCard,
+} from '@/components/admin/ui';
+import { base44 } from '@/api/base44Client';
+import { Plus, Edit, Trash2, Beaker, ExternalLink, Copy, Eye, MousePointerClick, Users2 } from 'lucide-react';
 
-const STATUS_TONE = { published: "success", draft: "neutral", archived: "danger" };
-const BUILD_TONE = { planned: "neutral", in_progress: "warning", beta: "purple", live: "success" };
+const rate = (n, d) => (d ? `${Math.round((n / d) * 100)}%` : null);
 
 export default function Experiments() {
-  const [experiments, setExperiments] = useState([]);
+  const navigate = useNavigate();
+  const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("All");
-  const [buildFilter, setBuildFilter] = useState("All");
-  const [categoryFilter, setCategoryFilter] = useState("All");
-  const [selected, setSelected] = useState([]);
-  const [deleteConfirm, setDeleteConfirm] = useState(null);
-  const [aiModal, setAiModal] = useState(false);
-  const [aiPrompt, setAiPrompt] = useState("");
-  const [aiGenerating, setAiGenerating] = useState(false);
+  const [error, setError] = useState(null);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [buildFilter, setBuildFilter] = useState('All');
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
-  const fetchList = async () => {
-    setLoading(true);
-    try {
-      const r = await base44.entities.Experiment.list("-created_date", 200);
-      setExperiments(r ?? []);
-    } catch { setExperiments([]); }
+  const load = async () => {
+    setLoading(true); setError(null);
+    try { setRows((await base44.entities.Experiment.list('-created_date', 300)) || []); }
+    catch (e) { setError(e?.message || 'Failed to load experiments'); }
     setLoading(false);
   };
-  useEffect(() => { fetchList(); }, []);
+  useEffect(() => { load(); }, []);
 
-  const filtered = experiments.filter((e) => {
-    const ms = !search || e.title?.toLowerCase().includes(search.toLowerCase()) || e.slug?.toLowerCase().includes(search.toLowerCase());
-    const mst = statusFilter === "All" || e.status === statusFilter.toLowerCase();
-    const mb = buildFilter === "All" || e.build_status === buildFilter.toLowerCase();
-    const mc = categoryFilter === "All" || e.category === categoryFilter;
-    return ms && mst && mb && mc;
+  const filtered = rows.filter((r) => {
+    const q = search.toLowerCase();
+    const matchesSearch = !q || r.title?.toLowerCase().includes(q) || r.slug?.toLowerCase().includes(q) || r.path?.toLowerCase().includes(q);
+    const matchesStatus = statusFilter === 'All' || r.status === statusFilter;
+    const matchesBuild = buildFilter === 'All' || r.build_status === buildFilter;
+    return matchesSearch && matchesStatus && matchesBuild;
   });
 
-  const toggleLive = async (e) => {
-    const next = e.status === "published" ? "draft" : "published";
-    await base44.entities.Experiment.update(e.id, { status: next });
-    setExperiments((p) => p.map((x) => (x.id === e.id ? { ...x, status: next } : x)));
+  const totals = rows.reduce((a, r) => ({
+    views: a.views + (r.view_count || 0), clicks: a.clicks + (r.clicks || 0), leads: a.leads + (r.leads || 0),
+  }), { views: 0, clicks: 0, leads: 0 });
+
+  const duplicate = async (r) => {
+    const { id: _id, created_date: _c, updated_date: _u, ...rest } = r;
+    await base44.entities.Experiment.create({
+      ...rest, title: `${r.title} (copy)`, slug: `${r.slug}-copy`, path: `${r.path}-copy`,
+      status: 'draft', build_status: 'planned', view_count: 0, clicks: 0, leads: 0,
+    });
+    load();
   };
 
-  const duplicate = async (e) => {
-    const copy = { ...e, title: `${e.title} (Copy)`, slug: `${e.slug}-copy-${Date.now()}`, path: `${e.path}-copy`, status: "draft", view_count: 0, clicks: 0, leads: 0 };
-    delete copy.id; delete copy.created_date; delete copy.updated_date;
-    await base44.entities.Experiment.create(copy);
-    fetchList();
-  };
-
-  const remove = async (id) => {
-    await base44.entities.Experiment.delete(id);
-    setExperiments((p) => p.filter((x) => x.id !== id));
-    setDeleteConfirm(null);
-  };
-
-  const ctr = (e) => (!e.view_count ? "-" : (((e.clicks || 0) / e.view_count) * 100).toFixed(2) + "%");
-
-  const generateAI = async () => {
-    if (!aiPrompt.trim()) return;
-    setAiGenerating(true);
-    try {
-      const res = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate an Experiment record for the Accident Compensation Helper legal marketing platform. The experiment idea is: "${aiPrompt}". Return JSON with: title, slug (kebab-case), path (starts with /tools/ or /community/), experiment_type, category, hero_headline, hero_subheadline (1-2 sentences), short_description (1 sentence), utm_medium_label (short lowercase), disclaimer_short (1 sentence, educational tool only, not legal advice).`,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            title: { type: "string" }, slug: { type: "string" }, path: { type: "string" },
-            experiment_type: { type: "string" }, category: { type: "string" },
-            hero_headline: { type: "string" }, hero_subheadline: { type: "string" },
-            short_description: { type: "string" }, utm_medium_label: { type: "string" }, disclaimer_short: { type: "string" },
-          },
-        },
-        model: "claude_sonnet_4_6",
-      });
-      const created = await base44.entities.Experiment.create({
-        ...res, status: "draft", build_status: "planned",
-        primary_cta_url: "https://quiz.accidentcompensationhelper.com/s/eval",
-        primary_cta_text: "Start My Free Claim Check", view_count: 0, clicks: 0, leads: 0,
-      });
-      window.location.href = `/admin/experiments/${created.id}/edit`;
-    } catch { setAiGenerating(false); }
-  };
-
-  const liveCount = experiments.filter((e) => e.status === "published").length;
+  const confirmDelete = async () => { await base44.entities.Experiment.delete(deleteTarget.id); setDeleteTarget(null); load(); };
 
   return (
-    <AdminLayout title="Experiments" breadcrumbs={[{ label: "Admin", href: "/admin" }, { label: "Experiments" }]}>
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-bold text-white">Experiments</h2>
-          <p className="mt-1 text-sm text-admuted">{liveCount} live · {experiments.length} total</p>
-        </div>
-        <div className="flex gap-3">
-          <AdminButton variant="purple" onClick={() => setAiModal(true)}><Sparkles className="h-4 w-4" /> Generate with AI</AdminButton>
-          <Link to="/admin/experiments/new"><AdminButton><Plus className="h-4 w-4" /> New Experiment</AdminButton></Link>
-        </div>
+    <AdminLayout>
+      <PageHeader title="Experiments" description="Standalone tools and interactive pages used to test new acquisition angles."
+        actions={<Button variant="gold" icon={Plus} onClick={() => navigate('/admin/experiments/new')}>New Experiment</Button>} />
+
+      <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+        <StatCard label="Experiments" value={loading ? '—' : rows.length} icon={Beaker} tone="brand" />
+        <StatCard label="Total views" value={loading ? '—' : totals.views} icon={Eye} tone="neutral" />
+        <StatCard label="CTA clicks" value={loading ? '—' : totals.clicks} icon={MousePointerClick} tone="neutral" />
+        <StatCard label="Leads" value={loading ? '—' : totals.leads} icon={Users2} tone="success" />
       </div>
 
-      <Card className="mb-6 flex flex-wrap items-center gap-3">
-        <SearchBar value={search} onChange={setSearch} placeholder="Search by title or slug..." />
-        <LegacySelect value={statusFilter} onChange={setStatusFilter} options={["All", "published", "draft", "archived"]} />
-        <LegacySelect value={buildFilter} onChange={setBuildFilter} options={["All", "planned", "in_progress", "beta", "live"]} />
-        <LegacySelect value={categoryFilter} onChange={setCategoryFilter} options={["All", "Estimator", "Ticker", "Analyzer", "Map", "Generator", "Countdown", "Predictor", "Simulator", "Community", "Calculator", "Other"]} />
-      </Card>
-
-      <Card className="overflow-x-auto p-0">
-        {loading ? (
-          <div className="space-y-2 p-5">
-            {Array.from({ length: 6 }).map((_, i) => <div key={i} className="h-12 animate-pulse rounded bg-white/5" />)}
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="p-5"><LegacyEmptyState icon={Beaker} title="No experiments yet" body="Create your first experiment or generate one with AI." action={<Link to="/admin/experiments/new"><AdminButton><Plus className="h-4 w-4" /> New Experiment</AdminButton></Link>} /></div>
-        ) : (
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-white/10 text-admuted">
-                <th className="p-3 text-left"><input type="checkbox" className="accent-brand" onChange={(e) => setSelected(e.target.checked ? filtered.map((x) => x.id) : [])} checked={selected.length === filtered.length && filtered.length > 0} /></th>
-                <th className="p-3 text-left font-medium">Title / Headline</th>
-                <th className="hidden p-3 text-left font-medium md:table-cell">Path</th>
-                <th className="p-3 text-left font-medium">Status</th>
-                <th className="hidden p-3 text-left font-medium lg:table-cell">Build</th>
-                <th className="p-3 text-right font-medium">Views</th>
-                <th className="hidden p-3 text-right font-medium sm:table-cell">Clicks</th>
-                <th className="hidden p-3 text-right font-medium sm:table-cell">CTR</th>
-                <th className="hidden p-3 text-right font-medium lg:table-cell">Leads</th>
-                <th className="p-3 text-right font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((e) => (
-                <tr key={e.id} className="border-b border-white/5 hover:bg-white/5">
-                  <td className="p-3"><input type="checkbox" className="accent-brand" checked={selected.includes(e.id)} onChange={(ev) => setSelected((p) => ev.target.checked ? [...p, e.id] : p.filter((x) => x !== e.id))} /></td>
-                  <td className="p-3">
-                    <Link to={`/admin/experiments/${e.id}/edit`} className="font-semibold text-white hover:text-brand">{e.title}</Link>
-                    {e.hero_headline && <div className="text-xs text-admuted">{e.hero_headline}</div>}
-                  </td>
-                  <td className="hidden p-3 font-mono text-xs text-brand md:table-cell">{e.path}</td>
-                  <td className="p-3"><LegacyPill tone={STATUS_TONE[e.status]}>{e.status}</LegacyPill></td>
-                  <td className="hidden p-3 lg:table-cell"><LegacyPill tone={BUILD_TONE[e.build_status]}>{e.build_status}</LegacyPill></td>
-                  <td className="p-3 text-right text-white">{e.view_count || 0}</td>
-                  <td className="hidden p-3 text-right text-slate-300 sm:table-cell">{e.clicks || 0}</td>
-                  <td className="hidden p-3 text-right text-slate-300 sm:table-cell">{ctr(e)}</td>
-                  <td className="hidden p-3 text-right text-slate-300 lg:table-cell">{e.leads || 0}</td>
-                  <td className="p-3">
-                    <div className="flex items-center justify-end gap-1.5">
-                      <a href={e.path} target="_blank" rel="noopener noreferrer" title="Open" className="rounded p-1.5 text-admuted hover:bg-white/10 hover:text-white"><ExternalLink className="h-4 w-4" /></a>
-                      <Link to={`/admin/experiments/${e.id}/edit`} title="Edit" className="rounded p-1.5 text-admuted hover:bg-white/10 hover:text-white"><Edit className="h-4 w-4" /></Link>
-                      <button onClick={() => duplicate(e)} title="Duplicate" className="rounded p-1.5 text-admuted hover:bg-white/10 hover:text-white"><Copy className="h-4 w-4" /></button>
-                      <button onClick={() => toggleLive(e)} title="Toggle live" className="rounded p-1.5 text-admuted hover:bg-white/10 hover:text-white">{e.status === "published" ? <ToggleRight className="h-4 w-4 text-success" /> : <ToggleLeft className="h-4 w-4" />}</button>
-                      <button onClick={() => setDeleteConfirm(e)} title="Delete" className="rounded p-1.5 text-admuted hover:bg-white/10 hover:text-destructive"><Trash2 className="h-4 w-4" /></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </Card>
-
-      <LegacyModal open={!!deleteConfirm} onClose={() => setDeleteConfirm(null)} title="Delete experiment?">
-        <p className="text-sm text-slate-300">Are you sure you want to delete "{deleteConfirm?.title}"? This cannot be undone.</p>
-        <div className="mt-6 flex justify-end gap-3">
-          <AdminButton variant="secondary" onClick={() => setDeleteConfirm(null)}>Cancel</AdminButton>
-          <AdminButton variant="danger" onClick={() => remove(deleteConfirm.id)}><Trash2 className="h-4 w-4" /> Delete</AdminButton>
+      <Panel padded={false}>
+        <div className="flex flex-wrap items-center gap-3 p-4">
+          <SearchInput value={search} onChange={setSearch} placeholder="Search by title, slug or path..." className="min-w-[220px] flex-1" />
+          <SelectInput value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} options={['All', 'draft', 'published', 'archived']} />
+          <SelectInput value={buildFilter} onChange={(e) => setBuildFilter(e.target.value)} options={['All', 'planned', 'in_progress', 'beta', 'live']} />
         </div>
-      </LegacyModal>
+        <DataTable
+          loading={loading} error={error} onRetry={load} rows={filtered}
+          onRowClick={(r) => navigate(`/admin/experiments/${r.id}/edit`)}
+          empty={<div className="p-4"><EmptyState icon={Beaker} title="No experiments yet"
+            description="Build a calculator, checker or interactive tool and measure whether it converts."
+            action={<Button variant="gold" icon={Plus} onClick={() => navigate('/admin/experiments/new')}>New Experiment</Button>} /></div>}
+          columns={[
+            { key: 'title', header: 'Title' },
+            { key: 'path', header: 'Path', render: (r) => <Pill>{r.path}</Pill> },
+            { key: 'category', header: 'Category' },
+            { key: 'build_status', header: 'Build', render: (r) => <StatusBadge status={r.build_status} /> },
+            { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
+            { key: 'view_count', header: 'Views' },
+            { key: 'ctr', header: 'CTR', render: (r) => rate(r.clicks, r.view_count) },
+            { key: 'leads', header: 'Leads' },
+            {
+              key: 'actions', header: '', className: 'text-right',
+              render: (r) => (
+                <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
+                  {r.status === 'published' && r.path && (
+                    <a href={r.path} target="_blank" rel="noopener noreferrer"><Button variant="ghost" size="sm" icon={ExternalLink} title="View live" /></a>
+                  )}
+                  <Button variant="ghost" size="sm" icon={Copy} title="Duplicate" onClick={() => duplicate(r)} />
+                  <Button variant="ghost" size="sm" icon={Edit} title="Edit" onClick={() => navigate(`/admin/experiments/${r.id}/edit`)} />
+                  <Button variant="ghost" size="sm" icon={Trash2} title="Delete" onClick={() => setDeleteTarget(r)} />
+                </div>
+              ),
+            },
+          ]}
+        />
+      </Panel>
 
-      <LegacyModal open={aiModal} onClose={() => setAiModal(false)} title="Generate with AI" wide>
-        <p className="text-sm text-slate-300">Describe the experiment you want to create. AI will draft the headline, path, and copy for you.</p>
-        <textarea rows={4} value={aiPrompt} onChange={(e) => setAiPrompt(e.target.value)} placeholder="e.g. A tool that estimates what a rear-end collision claim might be worth" className="mt-4 w-full rounded-lg border border-navyline bg-navy/60 px-3 py-2 text-sm text-white placeholder-admuted/60 outline-none focus:border-brand" />
-        <div className="mt-6 flex justify-end gap-3">
-          <AdminButton variant="secondary" onClick={() => setAiModal(false)}>Cancel</AdminButton>
-          <AdminButton variant="purple" onClick={generateAI} disabled={aiGenerating}>{aiGenerating ? "Generating..." : <><Sparkles className="h-4 w-4" /> Generate</>}</AdminButton>
-        </div>
-      </LegacyModal>
+      <ConfirmDialog open={!!deleteTarget} onClose={() => setDeleteTarget(null)} onConfirm={confirmDelete}
+        consequence={`"${deleteTarget?.title}" will be permanently deleted. Any traffic pointed at ${deleteTarget?.path} will start hitting a 404.`} />
     </AdminLayout>
   );
 }
