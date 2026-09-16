@@ -85,6 +85,11 @@ Deno.serve(async (req) => {
     // the captured record or block this response) ---
     fireDeliveries(base44, created.id).catch(() => {});
 
+    // --- attribute the lead back to its capture surface, so landing page
+    // and survey conversion figures have a real source rather than sitting
+    // at zero forever ---
+    creditSource(db, lead).catch(() => {});
+
     db.entities.AuditLog.create({
       actor_email: `system:ingestLead:${lead.source}`,
       action: 'lead.created', entity_type: 'Lead', entity_id: created.id,
@@ -107,4 +112,15 @@ async function fireDeliveries(base44, leadId) {
       entity_type: 'Lead', entity_id: leadId, summary: e?.message || String(e),
     }).catch(() => {});
   });
+}
+
+// Increment the lead counter on whichever surface captured this lead.
+// Best-effort: never blocks or fails the capture.
+async function creditSource(db, lead) {
+  if (!lead.source_ref) return;
+  if (lead.source === 'landing_page' || lead.source === 'advertorial') {
+    const matches = await db.entities.LandingPage.filter({ slug: lead.source_ref }).catch(() => []);
+    const page = (matches || [])[0];
+    if (page) await db.entities.LandingPage.update(page.id, { leads: (page.leads || 0) + 1 }).catch(() => {});
+  }
 }
