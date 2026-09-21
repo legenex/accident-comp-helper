@@ -17,7 +17,7 @@ export function Privacy() {
     <LegalLayout title="Privacy Policy" updated="September 2026">
       <p>This Privacy Policy ("Policy") applies to the personal information collected by Next Consulting LLC ("we" or "us") through the dontsettle.co website ("Website"). We are committed to protecting your privacy and handling your personal information in accordance with applicable data protection laws.</p>
       <h2>Information We Collect</h2>
-      <p>We collect the details you provide during the claim check, such as the type of accident, when and where it happened, and whether you were injured. We may also collect contact information if you choose to request a connection with a participating attorney.</p>
+      <p>We may collect the following types of personal information from you:</p>
       <h2>How We Use Your Information</h2>
       <ul>
         <li>To provide and improve the claim check.</li>
