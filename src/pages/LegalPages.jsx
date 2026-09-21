@@ -8,14 +8,14 @@ function LegalLayout({ title, updated, children }) {
       <Section className="bg-white">
         <article className="prose-legal mx-auto max-w-3xl text-navy">{children}</article>
       </Section>
-    </>
-  );
+    </>);
+
 }
 
 export function Privacy() {
   return (
     <LegalLayout title="Privacy Policy" updated="September 2026">
-      <p>Your privacy matters to us. This Privacy Policy explains how Accident Compensation Helper ("we", "us") collects, uses, and protects your information when you use our website and claim check.</p>
+      <p>This Privacy Policy ("Policy") applies to the personal information collected by Next Consulting LLC ("we" or "us") through the dontsettle.co website ("Website"). We are committed to protecting your privacy and handling your personal information in accordance with applicable data protection laws.</p>
       <h2>Information We Collect</h2>
       <p>We collect the details you provide during the claim check, such as the type of accident, when and where it happened, and whether you were injured. We may also collect contact information if you choose to request a connection with a participating attorney.</p>
       <h2>How We Use Your Information</h2>
@@ -33,8 +33,8 @@ export function Privacy() {
       <p>You are not required to complete the claim check. You may request access to or deletion of your information by contacting us at support@accidentcompensationhelper.com.</p>
       <h2>Contact</h2>
       <p>Questions about this policy? Email support@accidentcompensationhelper.com.</p>
-    </LegalLayout>
-  );
+    </LegalLayout>);
+
 }
 
 export function Terms() {
@@ -51,8 +51,8 @@ export function Terms() {
       <p>The site is provided "as is" without warranties. We do not guarantee any particular outcome from the claim check.</p>
       <h2>Changes</h2>
       <p>We may update these Terms from time to time. Continued use of the site means you accept the updated Terms.</p>
-    </LegalLayout>
-  );
+    </LegalLayout>);
+
 }
 
 export function PrivacyChoices() {
@@ -65,6 +65,6 @@ export function PrivacyChoices() {
       <p>You may request access to or deletion of the information you provided by contacting support@accidentcompensationhelper.com.</p>
       <h2>Marketing Communications</h2>
       <p>You can opt out of marketing communications at any time by following the unsubscribe link in any email or by contacting us.</p>
-    </LegalLayout>
-  );
+    </LegalLayout>);
+
 }
