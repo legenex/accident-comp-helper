@@ -43,7 +43,6 @@ function useLegalPage(slug) {
       if (!cancelled) setPage({ ...fallback, loading: false });
     })();
     return () => { cancelled = true; };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
   useEffect(() => {
