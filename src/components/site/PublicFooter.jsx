@@ -35,6 +35,7 @@ export default function PublicFooter() {
               <li><Link to="/privacy" className="hover:text-white">Privacy Policy</Link></li>
               <li><Link to="/terms" className="hover:text-white">Terms and Conditions</Link></li>
               <li><Link to="/privacy-choices" className="hover:text-white">Your Privacy Choices</Link></li>
+              <li><Link to="/disclosures" className="hover:text-white">Disclosures</Link></li>
             </ul>
           </div>
           <div>

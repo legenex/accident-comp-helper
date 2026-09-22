@@ -27,7 +27,7 @@ import AccidentTypes from '@/pages/AccidentTypes';
 import Resources from '@/pages/Resources';
 import Blog from '@/pages/Blog';
 import BlogDetail from '@/pages/BlogDetail';
-import { Privacy, Terms, PrivacyChoices } from '@/pages/LegalPages';
+import { Privacy, Terms, PrivacyChoices, Disclosures } from '@/pages/LegalPages';
 import ClaimCheck from '@/pages/ClaimCheck';
 import Submitted from '@/pages/Submitted';
 import Thanks from '@/pages/Thanks';
@@ -109,6 +109,7 @@ const AuthenticatedApp = () => {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy-choices" element={<PrivacyChoices />} />
+        <Route path="/disclosures" element={<Disclosures />} />
       </Route>
 
       {/* Claim flow + standalone public routes */}
