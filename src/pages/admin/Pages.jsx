@@ -27,7 +27,8 @@ export default function Pages() {
             <TextInput label="Slug" value={editing.slug} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} />
           </div>
           <SelectInput label="Status" value={editing.status} options={['draft', 'published', 'archived']} onChange={(e) => setEditing({ ...editing, status: e.target.value })} />
-          <TextArea label="Body" rows={10} value={editing.body} onChange={(e) => setEditing({ ...editing, body: e.target.value })} />
+          <p className="text-xs text-slate-500">Body supports Markdown (## Heading, ### Subheading, - bullet, [link](url)). Footer legal pages use slugs: privacy, terms, privacy-choices. Only published pages go live.</p>
+          <TextArea label="Body" rows={18} value={editing.body} onChange={(e) => setEditing({ ...editing, body: e.target.value })} />
           <TextInput label="Meta title" value={editing.meta_title} onChange={(e) => setEditing({ ...editing, meta_title: e.target.value })} />
           <TextArea label="Meta description" rows={3} value={editing.meta_description} onChange={(e) => setEditing({ ...editing, meta_description: e.target.value })} />
         </div>
