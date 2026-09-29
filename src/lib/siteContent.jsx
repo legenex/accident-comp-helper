@@ -4,6 +4,8 @@ export const SITE = {
   name: "Accident Compensation Helper",
   domain: "accidentcompensationhelper.com",
   email: "support@accidentcompensationhelper.com",
+  // Inbound number shown on /submitted. Leave empty to hide the call-now block.
+  phone: "",
 };
 
 export const NAV_LINKS = [
