@@ -87,9 +87,9 @@ export default function Submitted() {
               </div>
 
               <p className="mx-auto mt-5 max-w-xl text-xs italic leading-relaxed text-slate-500">
-                <span className="font-semibold not-italic text-slate-600">Please note:</span> we can't confirm
-                your match or connect you with an attorney until we've spoken with you. The call may come from
-                an unfamiliar number, so keep your phone close.
+                <span className="font-semibold not-italic text-slate-600">Please note:</span> we can't process
+                your claim until we've spoken with you. The call may come from an unfamiliar number, so keep
+                your phone close.
               </p>
 
               {/* Don't wanna wait */}
