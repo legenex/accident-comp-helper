@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Phone, Clock, Check, PhoneCall } from "lucide-react";
 import { SITE } from "@/lib/siteContent";
-import { Wordmark } from "@/components/site/Logo";
+import Logo from "@/components/site/Logo";
 import { PhoneHeader, PhoneButton, MiniFooter } from "@/components/site/PhoneBits";
 
 // Post-submission page: the lead has completed the quiz and a specialist is
@@ -43,7 +43,7 @@ export default function Submitted() {
   return (
     <div className="flex min-h-screen flex-col bg-navy">
       <PhoneHeader>
-        <Wordmark variant="light" className="h-8 w-auto sm:h-9" />
+        <Logo variant="light" className="h-8 w-auto sm:h-9" />
       </PhoneHeader>
 
       <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12">
