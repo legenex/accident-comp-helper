@@ -1,4 +1,23 @@
-export const QUIZ_URL = "https://quiz.accidentcompensationhelper.com/s/eval";
+export const QUIZ_BASE = "https://quiz.accidentcompensationhelper.com/s/mva";
+
+/**
+ * Build a quiz CTA url with UTM tracking. `medium` identifies the button
+ * the visitor clicked (e.g. "Home-Form", "Nav-Button"). `extra` adds any
+ * extra query params, e.g. { type: "auto-accidents" }.
+ */
+export function quizUrl(medium = "Button", extra = {}) {
+  const params = new URLSearchParams({
+    utm_source: "Website",
+    utm_campaign: "ACH-Home",
+    utm_medium: medium,
+  });
+  Object.entries(extra).forEach(([k, v]) => {
+    if (v != null && v !== "") params.set(k, v);
+  });
+  return `${QUIZ_BASE}?${params.toString()}`;
+}
+
+export const QUIZ_URL = quizUrl("Button");
 
 export const SITE = {
   name: "Accident Compensation Helper",

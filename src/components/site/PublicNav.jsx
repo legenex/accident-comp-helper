@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Menu, X, ShieldCheck } from "lucide-react";
 import Logo from "./Logo";
-import { NAV_LINKS, QUIZ_URL } from "@/lib/siteContent";
+import { NAV_LINKS, quizUrl } from "@/lib/siteContent";
 import { cn } from "@/lib/utils";
 
 export default function PublicNav() {
@@ -57,7 +57,7 @@ export default function PublicNav() {
           </nav>
           <div className="hidden lg:block">
             <a
-              href={QUIZ_URL}
+              href={quizUrl("Nav-Button")}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white shadow-lift transition-transform hover:scale-[1.03] hover:bg-brand-hover"
@@ -99,7 +99,7 @@ export default function PublicNav() {
             </nav>
             <div className="mt-auto pb-10">
               <a
-                href={QUIZ_URL}
+                href={quizUrl("Nav-Mobile-Button")}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setOpen(false)}

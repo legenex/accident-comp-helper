@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { Car, Truck, Bike, PersonStanding, HardHat, Footprints, Scale, ArrowRight } from "lucide-react";
 import { PageHero, Section, CTAButton } from "@/components/site/ui";
-import { ACCIDENT_TYPES, QUIZ_URL } from "@/lib/siteContent";
+import { ACCIDENT_TYPES, quizUrl } from "@/lib/siteContent";
 import { ACCIDENT_PHOTOS, photo } from "@/lib/siteImages";
 
 const ICONS = { Car, Truck, Bike, PersonStanding, HardHat, Footprints, Scale };
@@ -23,7 +23,7 @@ export default function AccidentTypes() {
             return (
               <motion.a
                 key={t.slug}
-                href={`${QUIZ_URL}?type=${encodeURIComponent(t.slug)}`}
+                href={quizUrl("AccidentTypes-Button", { type: t.slug })}
                 target="_blank"
                 rel="noopener noreferrer"
                 initial={{ opacity: 0, y: 18 }}

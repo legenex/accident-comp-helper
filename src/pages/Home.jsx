@@ -8,7 +8,7 @@ import {
 import { CTAButton, Section, SectionHeading } from "@/components/site/ui";
 import HeroBackdrop from "@/components/site/HeroBackdrop";
 import ClaimStarter from "@/components/site/ClaimStarter";
-import { QUIZ_URL, ACCIDENT_TYPES, STEPS, FAQS, STATS, TRUST_POINTS } from "@/lib/siteContent";
+import { quizUrl, ACCIDENT_TYPES, STEPS, FAQS, STATS, TRUST_POINTS } from "@/lib/siteContent";
 import { HERO_SLIDES, ACCIDENT_PHOTOS, SUPPORT_PHOTOS, photo } from "@/lib/siteImages";
 
 const ICONS = { Car, Truck, Bike, PersonStanding, HardHat, Footprints, Scale };
@@ -190,7 +190,7 @@ function AccidentTypesSection() {
           return (
             <motion.a
               key={t.slug}
-              href={`${QUIZ_URL}?type=${encodeURIComponent(t.slug)}`}
+              href={quizUrl("Home-AccidentType-Button", { type: t.slug })}
               target="_blank"
               rel="noopener noreferrer"
               variants={rise}

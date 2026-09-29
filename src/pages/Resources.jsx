@@ -2,7 +2,7 @@ import React from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { PageHero, Section, CTAButton } from "@/components/site/ui";
-import { QUIZ_URL } from "@/lib/siteContent";
+import { quizUrl } from "@/lib/siteContent";
 import { RESOURCE_PHOTOS, photo } from "@/lib/siteImages";
 
 const RESOURCES = [
@@ -27,7 +27,7 @@ export default function Resources() {
           {RESOURCES.map((r, i) => (
             <motion.a
               key={r.key}
-              href={QUIZ_URL}
+              href={quizUrl("Resources-Button")}
               target="_blank"
               rel="noopener noreferrer"
               initial={{ opacity: 0, y: 18 }}

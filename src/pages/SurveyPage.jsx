@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { ArrowRight, ArrowLeft, ShieldCheck, Lock, Clock } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { QUIZ_URL } from "@/lib/siteContent";
+import { quizUrl } from "@/lib/siteContent";
 
 // Public survey renderer. Renders a Survey built in the admin Survey Builder:
 // its questions, conditional visibility, contact capture and consent, then
@@ -59,9 +59,9 @@ export default function SurveyPage() {
         setSurvey(found);
         // No published survey for this slug — send them to the hosted quiz
         // rather than showing a broken page.
-        if (!found) window.location.href = QUIZ_URL;
+        if (!found) window.location.href = quizUrl("Survey-Redirect");
       })
-      .catch(() => { window.location.href = QUIZ_URL; })
+      .catch(() => { window.location.href = quizUrl("Survey-Redirect"); })
       .finally(() => setLoading(false));
   }, [slug]);
 

@@ -4,7 +4,7 @@ import {
   ArrowRight, ShieldCheck, Car, Truck, Bike, PersonStanding,
   HardHat, Footprints, Check, Lock, Clock,
 } from "lucide-react";
-import { QUIZ_URL, ACCIDENT_TYPES } from "@/lib/siteContent";
+import { quizUrl, ACCIDENT_TYPES } from "@/lib/siteContent";
 
 const ICONS = { Car, Truck, Bike, PersonStanding, HardHat, Footprints };
 
@@ -20,7 +20,7 @@ const ICONS = { Car, Truck, Bike, PersonStanding, HardHat, Footprints };
 export default function ClaimStarter() {
   const [picked, setPicked] = useState(null);
   const options = ACCIDENT_TYPES.slice(0, 6);
-  const href = picked ? `${QUIZ_URL}?type=${encodeURIComponent(picked)}` : QUIZ_URL;
+  const href = quizUrl("Home-Form", picked ? { type: picked } : {});
 
   return (
     <motion.div
