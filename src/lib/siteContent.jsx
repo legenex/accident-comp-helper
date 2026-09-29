@@ -5,7 +5,8 @@ export const SITE = {
   domain: "accidentcompensationhelper.com",
   email: "support@accidentcompensationhelper.com",
   // Inbound number shown on /submitted. Leave empty to hide the call-now block.
-  phone: "",
+  phone: "(877) 352-0129",
+  phoneHref: "tel:+18773520129",
 };
 
 export const NAV_LINKS = [
