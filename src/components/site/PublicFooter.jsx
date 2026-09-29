@@ -11,7 +11,7 @@ export default function PublicFooter() {
       <div className="border-t border-white/10">
         <div className="mx-auto grid max-w-[1280px] gap-10 px-6 py-16 md:grid-cols-4">
           <div className="md:col-span-1">
-            <Logo variant="light" />
+            <Logo variant="light" className="h-14 w-auto" />
             <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/60">
               Accident Compensation Helper provides a free, confidential claim check and, if you choose, can help you
               request contact with participating attorneys. We are not a law firm and do not provide legal advice.

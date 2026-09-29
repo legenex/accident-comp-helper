@@ -82,13 +82,13 @@ export default function Logo({ variant = "dark", className, showMark = true, wor
   }
 
   const inlineLockup = (
-    <div className={cn("flex items-center gap-2.5", className)}>
-      {showMark && <Mark className="h-9 w-9 flex-shrink-0" />}
+    <div className={cn("flex items-center gap-3", className)}>
+      {showMark && <Mark className="h-11 w-11 flex-shrink-0" />}
       <div className="leading-[1.05]">
-        <div className={cn("font-heading text-[17px] font-extrabold tracking-tight", textColor)}>
+        <div className={cn("font-heading text-[22px] font-extrabold tracking-tight", textColor)}>
           Accident Compensation
         </div>
-        <div className={cn("font-heading text-[17px] font-extrabold tracking-tight", textColor)}>
+        <div className={cn("font-heading text-[22px] font-extrabold tracking-tight", textColor)}>
           Helper
         </div>
       </div>
@@ -99,7 +99,7 @@ export default function Logo({ variant = "dark", className, showMark = true, wor
     <SmartImage
       src={WORDMARK_SRC[light ? "light" : "dark"]}
       alt="Accident Compensation Helper"
-      className={cn("h-9 w-auto", className)}
+      className={cn("h-12 w-auto", className)}
       fallback={inlineLockup}
     />
   );
