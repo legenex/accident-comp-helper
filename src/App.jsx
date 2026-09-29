@@ -6,6 +6,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
+import OAuthConsent from '@/pages/OAuthConsent';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import RequireRole from '@/components/admin/RequireRole';
 import { ROUTE_REDIRECTS } from '@/lib/admin-nav';
@@ -94,6 +95,7 @@ const AuthenticatedApp = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/oauth/consent" element={<OAuthConsent />} />
 
       {/* Public site */}
       <Route element={<PublicLayout />}>
