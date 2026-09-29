@@ -54,7 +54,7 @@ export default function Submitted() {
       <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12">
         <div className="mx-auto w-full max-w-4xl">
           {/* Primary card */}
-          <div className="overflow-hidden rounded-2xl bg-white shadow-2xl">
+          <div className="overflow-hidden rounded-2xl bg-white shadow-2xl" style={{ border: "4px solid #028CC9" }}>
             <div className="px-5 py-8 text-center sm:px-10 sm:py-12 lg:px-14">
               {/* Call incoming alert */}
               <div className="mx-auto max-w-sm rounded-xl border-2 border-brand bg-navy px-6 py-6 shadow-lg">
@@ -163,8 +163,8 @@ export default function Submitted() {
       {/* No Win, No Fee guarantee banner */}
       <section className="px-4 pb-10 sm:px-6">
         <div
-          className="mx-auto flex max-w-4xl items-center gap-6 rounded-2xl bg-white px-6 py-8 sm:px-10 sm:py-10"
-          style={{ border: "4px solid #028CC9" }}
+          className="mx-auto flex max-w-4xl items-center gap-6 rounded-2xl px-6 py-8 sm:px-10 sm:py-10"
+          style={{ backgroundColor: "#028CC9", border: "4px solid #028CC9" }}
         >
           <div className="flex-1 text-left">
             <h2 className="font-heading text-xl font-extrabold uppercase tracking-tight text-navy sm:text-2xl">
@@ -181,7 +181,7 @@ export default function Submitted() {
             </p>
           </div>
           <div className="hidden shrink-0 sm:flex sm:items-center sm:justify-center">
-            <Award className="h-16 w-16" strokeWidth={1.5} style={{ color: "#028CC9" }} />
+            <Award className="h-16 w-16 text-white" strokeWidth={1.5} />
           </div>
         </div>
       </section>
