@@ -22,7 +22,7 @@ export default function Thanks() {
   return (
     <div className="flex min-h-screen flex-col bg-navy">
       <PhoneHeader>
-        <Logo variant="light" className="h-8 w-auto sm:h-9" />
+        <Logo variant="light" className="h-16 w-auto sm:h-20" />
       </PhoneHeader>
 
       <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12">

@@ -1,5 +1,7 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Phone } from "lucide-react";
+import Logo from "./Logo";
 import { SITE } from "@/lib/siteContent";
 
 // Ringba / TrueCall dynamic number insertion.
@@ -54,7 +56,10 @@ export function MiniFooter() {
   return (
     <footer className="border-t border-white/10 px-4 py-6">
       <div className="mx-auto max-w-5xl text-center">
-        <p className="text-xs leading-relaxed text-white/45">
+        <Link to="/" className="inline-flex items-center justify-center" aria-label="Accident Compensation Helper home">
+          <Logo variant="light" className="h-16 w-auto" />
+        </Link>
+        <p className="mt-4 text-xs leading-relaxed text-white/45">
           &copy; {new Date().getFullYear()} Next Consulting LLC. All rights reserved. {SITE.name} is not a law
           firm and does not provide legal advice.
         </p>

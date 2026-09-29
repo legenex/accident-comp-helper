@@ -36,7 +36,7 @@ export default function PublicNav() {
       >
         <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-5 sm:px-8">
           <Link to="/" className="flex items-center" aria-label="Accident Compensation Helper home">
-            <Logo variant="light" />
+            <Logo variant="light" className="h-16 w-auto sm:h-20" />
           </Link>
           <nav className="hidden items-center gap-1 lg:flex">
             {NAV_LINKS.map((l) => (
@@ -80,7 +80,7 @@ export default function PublicNav() {
           <div className="absolute inset-0 bg-navy/90 backdrop-blur-xl" onClick={() => setOpen(false)} />
           <div className="relative flex h-full flex-col bg-navy px-6 pt-6">
             <div className="flex items-center justify-between">
-              <Logo variant="light" />
+              <Logo variant="light" className="h-16 w-auto" />
               <button onClick={() => setOpen(false)} className="flex h-10 w-10 items-center justify-center rounded-lg text-white" aria-label="Close menu">
                 <X className="h-6 w-6" />
               </button>

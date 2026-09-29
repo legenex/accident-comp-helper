@@ -48,7 +48,7 @@ export default function Submitted() {
   return (
     <div className="flex min-h-screen flex-col bg-white">
       <PhoneHeader>
-        <Logo variant="light" className="h-12 w-auto sm:h-14" />
+        <Logo variant="light" className="h-16 w-auto sm:h-20" />
       </PhoneHeader>
 
       <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12">
