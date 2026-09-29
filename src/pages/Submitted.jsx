@@ -68,7 +68,8 @@ export default function Submitted() {
               </div>
 
               <h1 className="mt-8 font-heading text-3xl font-extrabold leading-tight tracking-tight text-navy sm:text-4xl lg:text-5xl">
-                <span className="font-black text-brand">CONGRATS{firstName ? `, ${firstName}` : ""}!</span> It Appears You Have A{" "}
+                <span className="block font-black text-brand">CONGRATS{firstName ? `, ${firstName}` : ""}!</span>
+                <span className="block">It Appears You Have A</span>
                 <span className="block font-display italic font-bold" style={{ color: "#028CC9" }}>High Value Claim!</span>
               </h1>
 
