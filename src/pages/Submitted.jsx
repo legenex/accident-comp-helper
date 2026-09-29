@@ -63,7 +63,7 @@ export default function Submitted() {
                 </div>
                 <p className="mt-4 font-heading text-lg font-bold text-white">You're Almost Done!</p>
                 <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand">
-                  Keep your phone nearby
+                  Important Call Incoming!
                 </p>
               </div>
 
