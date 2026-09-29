@@ -61,7 +61,7 @@ export default function Submitted() {
                 <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-brand text-white">
                   <Phone className="h-5 w-5" />
                 </div>
-                <p className="mt-4 font-heading text-lg font-bold text-white">Important: call incoming</p>
+                <p className="mt-4 font-heading text-lg font-bold text-white">You're Almost Done!</p>
                 <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-brand">
                   Keep your phone nearby
                 </p>
