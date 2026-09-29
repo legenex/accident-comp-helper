@@ -46,7 +46,7 @@ export default function Submitted() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col bg-navy">
+    <div className="flex min-h-screen flex-col bg-white">
       <PhoneHeader>
         <Logo variant="light" className="h-8 w-auto sm:h-9" />
       </PhoneHeader>
