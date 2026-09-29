@@ -167,10 +167,10 @@ export default function Submitted() {
           style={{ backgroundColor: "#028CC9", border: "4px solid #028CC9" }}
         >
           <div className="flex-1 text-left">
-            <h2 className="font-heading text-xl font-extrabold uppercase tracking-tight text-navy sm:text-2xl">
+            <h2 className="font-heading text-xl font-extrabold uppercase tracking-tight text-white sm:text-2xl">
               No Win, No Fee Guarantee
             </h2>
-            <p className="mt-4 max-w-2xl text-sm font-bold leading-relaxed text-navy sm:text-base">
+            <p className="mt-4 max-w-2xl text-sm font-bold leading-relaxed text-white sm:text-base">
               The attorneys in our network work on contingency — you pay nothing upfront and nothing out of
               pocket while your case is being handled. If they don't secure compensation for you, you owe no
               attorney fees. When you do win, the attorney's fee is a pre-agreed percentage of the recovery,
