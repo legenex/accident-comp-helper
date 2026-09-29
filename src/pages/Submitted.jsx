@@ -36,8 +36,13 @@ const TRUST = [
 ];
 
 export default function Submitted() {
+  const [firstName, setFirstName] = React.useState("");
+
   useEffect(() => {
     document.title = `We'll be calling you | ${SITE.name}`;
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("first_name") || "";
+    setFirstName(name);
   }, []);
 
   return (
@@ -63,7 +68,7 @@ export default function Submitted() {
               </div>
 
               <h1 className="mt-8 font-heading text-3xl font-extrabold leading-tight tracking-tight text-navy sm:text-4xl lg:text-5xl">
-                <span className="font-black text-brand">CONGRATS.</span> We'll be{" "}
+                <span className="font-black text-brand">CONGRATS{firstName ? `, ${firstName}` : ""}!</span> We'll be{" "}
                 <span className="block font-display italic text-brand">calling you.</span>
               </h1>
 
