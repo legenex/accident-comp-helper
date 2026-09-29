@@ -18,8 +18,10 @@ import { cn } from "@/lib/utils";
 
 const MARK_SRC = "/brand/ach-mark.svg";
 const WORDMARK_SRC = {
-  dark: "/brand/ach-wordmark.svg",
-  light: "/brand/ach-wordmark-light.svg",
+  // "Dark" wordmark = dark text, for light/white backgrounds.
+  dark: "https://media.base44.com/images/public/6a99b2d2085e5c1eefdd7c0c/40a0854d9_ACHWideLogoDarkNew.png",
+  // "Light" wordmark = white text, for dark / #1D2C3B backgrounds.
+  light: "https://media.base44.com/images/public/6a99b2d2085e5c1eefdd7c0c/10460f486_ACHWideLogoLightNew.png",
 };
 
 /** Inline fallback mark. viewBox and rect now actually agree (they did not before). */
