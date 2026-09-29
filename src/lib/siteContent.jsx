@@ -1,4 +1,4 @@
-export const QUIZ_BASE = "https://quiz.accidentcompensationhelper.com/s/mva";
+export const QUIZ_BASE = "https://quiz.accidentcompensationhelper.com/s/eval";
 
 /**
  * Build a quiz CTA url with UTM tracking. `medium` identifies the button
