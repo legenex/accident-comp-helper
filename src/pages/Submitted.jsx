@@ -122,9 +122,7 @@ export default function Submitted() {
                 {STEPS.map((step, i) => (
                   <li
                     key={i}
-                    className={`relative rounded-xl border bg-white px-5 py-4 ${
-                      step.now ? "border-brand ring-1 ring-brand/30" : "border-slate-200"
-                    }`}
+                    className="relative rounded-xl bg-white px-5 py-4"
                   >
                     {step.now && (
                       <span className="absolute -top-2.5 right-4 rounded-full bg-brand px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
@@ -158,7 +156,7 @@ export default function Submitted() {
           {/* Trust row */}
           <ul className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
             {TRUST.map((item) => (
-              <li key={item} className="flex items-center gap-2 text-sm text-white/70">
+              <li key={item} className="flex items-center gap-2 text-sm font-bold text-brand">
                 <Check className="h-4 w-4 shrink-0 text-brand" /> {item}
               </li>
             ))}
@@ -170,7 +168,7 @@ export default function Submitted() {
       <section className="px-4 pb-10 sm:px-6">
         <div
           className="mx-auto flex max-w-4xl items-center gap-6 rounded-2xl px-6 py-8 shadow-lg sm:px-10 sm:py-10"
-          style={{ backgroundColor: "#028CC9" }}
+          style={{ backgroundColor: "#1D2C3B" }}
         >
           <div className="flex-1 text-left">
             <h2 className="font-heading text-xl font-extrabold uppercase tracking-tight text-white sm:text-2xl">
