@@ -108,7 +108,8 @@ const AuthenticatedApp = () => {
         <Route path="/blog/:slug" element={<BlogDetail />} />
         <Route path="/privacy-policy" element={<Privacy />} />
         <Route path="/privacy" element={<Navigate to="/privacy-policy" replace />} />
-        <Route path="/terms" element={<Terms />} />
+        <Route path="/terms-of-service" element={<Terms />} />
+        <Route path="/terms" element={<Navigate to="/terms-of-service" replace />} />
         <Route path="/privacy-choices" element={<PrivacyChoices />} />
         <Route path="/disclosures" element={<Disclosures />} />
         <Route path="/partner-list" element={<Partners />} />
