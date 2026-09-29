@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Check, Phone, PhoneCall, ArrowLeft } from "lucide-react";
 import { SITE } from "@/lib/siteContent";
+import PublicFooter from "@/components/site/PublicFooter";
 
 // Generic post-submission confirmation. Lighter than /submitted: the details
 // are in, a specialist will call, and there is no qualification language.
@@ -21,8 +22,8 @@ export default function Thanks() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-navy px-4 py-10 sm:px-6 sm:py-14">
-      <div className="mx-auto w-full max-w-2xl">
+    <main className="flex min-h-screen flex-col bg-navy">
+      <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
         <div className="rounded-2xl bg-white px-6 py-10 text-center shadow-2xl sm:px-10 sm:py-12">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-brand text-white">
             <Check className="h-8 w-8" strokeWidth={3} />
@@ -89,11 +90,9 @@ export default function Thanks() {
             </li>
           ))}
         </ul>
-
-        <p className="mt-10 text-center text-xs text-white/35">
-          &copy; {new Date().getFullYear()} Next Consulting LLC. All rights reserved. Not a law firm.
-        </p>
       </div>
+
+      <PublicFooter />
     </main>
   );
 }
