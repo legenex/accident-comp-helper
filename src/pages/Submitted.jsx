@@ -107,7 +107,10 @@ export default function Submitted() {
             </div>
 
             {/* What happens next */}
-            <div className="border-t border-slate-100 bg-slate-50 px-5 py-10 sm:px-10 lg:px-14">
+            <div
+              className="px-5 py-10 sm:px-10 lg:px-14"
+              style={{ backgroundColor: "#FFFFFF", borderTop: "4px solid #028CC9", borderBottom: "4px solid #028CC9", borderLeft: "4px solid #028CC9", borderRight: "4px solid #028CC9" }}
+            >
               <h2 className="flex items-center justify-center gap-2 font-heading text-xl font-bold text-navy sm:text-2xl">
                 <Clock className="h-5 w-5 text-brand" /> What happens next
               </h2>
