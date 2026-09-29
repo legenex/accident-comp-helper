@@ -60,8 +60,10 @@ export default function Submitted() {
             </div>
 
             <h1 className="mt-8 font-heading text-3xl font-extrabold leading-tight tracking-tight text-navy sm:text-4xl">
-              Congratulations. We'll be{" "}
-              <span className="block font-display italic text-brand">calling you.</span>
+              Congrats! It Appears You Have A{" "}
+              <span className="block font-display font-extrabold" style={{ color: "#028CC9" }}>
+                High Value Claim!
+              </span>
             </h1>
 
             <p className="mx-auto mt-5 max-w-lg text-[15px] leading-relaxed text-slate-600">
