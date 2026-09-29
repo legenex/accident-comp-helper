@@ -32,7 +32,7 @@ export default function PublicFooter() {
           <div>
             <h3 className="text-xs font-semibold uppercase tracking-[0.18em] text-white/45">Legal and Privacy</h3>
             <ul className="mt-5 space-y-3 text-sm text-white/70">
-              <li><Link to="/privacy" className="hover:text-white">Privacy Policy</Link></li>
+              <li><Link to="/privacy-policy" className="hover:text-white">Privacy Policy</Link></li>
               <li><Link to="/terms" className="hover:text-white">Terms and Conditions</Link></li>
               <li><Link to="/disclosures" className="hover:text-white">Disclosures</Link></li>
               <li><Link to="/partner-list" className="hover:text-white">Partners</Link></li>

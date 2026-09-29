@@ -261,7 +261,7 @@ function LegalPage({ slug }) {
   );
 }
 
-export function Privacy() { return <LegalPage slug="privacy" />; }
+export function Privacy() { return <LegalPage slug="privacy-policy" />; }
 export function Terms() { return <LegalPage slug="terms" />; }
 export function PrivacyChoices() { return <LegalPage slug="privacy-choices" />; }
 export function Disclosures() { return <LegalPage slug="disclosures" />; }
