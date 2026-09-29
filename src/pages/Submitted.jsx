@@ -168,16 +168,12 @@ export default function Submitted() {
         >
           <div className="flex-1 text-left">
             <h2 className="font-heading text-xl font-extrabold uppercase tracking-tight text-white sm:text-2xl">
-              No Win, No Fee Guarantee
+              Get the Right Help for Your Claim
             </h2>
             <p className="mt-4 max-w-2xl text-sm font-bold leading-relaxed text-white sm:text-base">
-              The attorneys in our network work on contingency — you pay nothing upfront and nothing out of
-              pocket while your case is being handled. If they don't secure compensation for you, you owe no
-              attorney fees. When you do win, the attorney's fee is a pre-agreed percentage of the recovery,
-              explained in plain language before you sign anything — so there are no surprises and no upfront
-              cost. For motor vehicle and workplace injury victims, that means real access to the legal help
-              you deserve, without the financial risk. You've been through enough already — let a professional
-              carry the weight from here. You have nothing to lose.
+              The right attorney can make a real difference in how your claim is handled. We help connect you
+              with attorneys who handle cases like yours, so you can understand your options and pursue the
+              compensation you may be entitled to.
             </p>
           </div>
           <div className="hidden shrink-0 sm:flex sm:items-center sm:justify-center">
