@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Phone, Clock, Check, PhoneCall } from "lucide-react";
+import { Phone, Clock, Check, PhoneCall, Award } from "lucide-react";
 import { SITE } from "@/lib/siteContent";
 import Logo from "@/components/site/Logo";
 import { PhoneHeader, PhoneButton, MiniFooter } from "@/components/site/PhoneBits";
@@ -159,6 +159,32 @@ export default function Submitted() {
           </ul>
         </div>
       </main>
+
+      {/* No Win, No Fee guarantee banner */}
+      <section className="px-4 pb-10 sm:px-6">
+        <div
+          className="mx-auto flex max-w-4xl items-center gap-6 rounded-2xl px-6 py-8 shadow-lg sm:px-10 sm:py-10"
+          style={{ backgroundColor: "#028CC9" }}
+        >
+          <div className="flex-1 text-left">
+            <h2 className="font-heading text-xl font-extrabold uppercase tracking-tight text-white sm:text-2xl">
+              No Win, No Fee Guarantee
+            </h2>
+            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/95 sm:text-base">
+              The attorneys in our network work on contingency — you pay nothing upfront and nothing out of
+              pocket while your case is being handled. If they don't secure compensation for you, you owe no
+              attorney fees. When you do win, the attorney's fee is a pre-agreed percentage of the recovery,
+              explained in plain language before you sign anything — so there are no surprises and no upfront
+              cost. For motor vehicle and workplace injury victims, that means real access to the legal help
+              you deserve, without the financial risk. You've been through enough already — let a professional
+              carry the weight from here. You have nothing to lose.
+            </p>
+          </div>
+          <div className="hidden shrink-0 sm:flex sm:items-center sm:justify-center">
+            <Award className="h-16 w-16 text-white" strokeWidth={1.5} />
+          </div>
+        </div>
+      </section>
 
       <MiniFooter />
     </div>
