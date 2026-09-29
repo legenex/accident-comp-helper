@@ -110,7 +110,8 @@ const AuthenticatedApp = () => {
         <Route path="/terms" element={<Terms />} />
         <Route path="/privacy-choices" element={<PrivacyChoices />} />
         <Route path="/disclosures" element={<Disclosures />} />
-        <Route path="/partners" element={<Partners />} />
+        <Route path="/partner-list" element={<Partners />} />
+        <Route path="/partners" element={<Navigate to="/partner-list" replace />} />
         <Route path="/ca-notice" element={<CANotice />} />
       </Route>
 
