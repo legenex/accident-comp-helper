@@ -163,14 +163,14 @@ export default function Submitted() {
       {/* No Win, No Fee guarantee banner */}
       <section className="px-4 pb-10 sm:px-6">
         <div
-          className="mx-auto flex max-w-4xl items-center gap-6 rounded-2xl px-6 py-8 shadow-lg sm:px-10 sm:py-10"
-          style={{ backgroundColor: "#028CC9" }}
+          className="mx-auto flex max-w-4xl items-center gap-6 rounded-2xl bg-white px-6 py-8 sm:px-10 sm:py-10"
+          style={{ border: "4px solid #028CC9" }}
         >
           <div className="flex-1 text-left">
-            <h2 className="font-heading text-xl font-extrabold uppercase tracking-tight text-white sm:text-2xl">
+            <h2 className="font-heading text-xl font-extrabold uppercase tracking-tight text-navy sm:text-2xl">
               No Win, No Fee Guarantee
             </h2>
-            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/95 sm:text-base">
+            <p className="mt-4 max-w-2xl text-sm font-bold leading-relaxed text-navy sm:text-base">
               The attorneys in our network work on contingency — you pay nothing upfront and nothing out of
               pocket while your case is being handled. If they don't secure compensation for you, you owe no
               attorney fees. When you do win, the attorney's fee is a pre-agreed percentage of the recovery,
@@ -181,12 +181,14 @@ export default function Submitted() {
             </p>
           </div>
           <div className="hidden shrink-0 sm:flex sm:items-center sm:justify-center">
-            <Award className="h-16 w-16 text-white" strokeWidth={1.5} />
+            <Award className="h-16 w-16" strokeWidth={1.5} style={{ color: "#028CC9" }} />
           </div>
         </div>
       </section>
 
-      <MiniFooter />
+      <div className="bg-navy">
+        <MiniFooter />
+      </div>
     </div>
   );
 }
