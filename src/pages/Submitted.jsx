@@ -46,7 +46,7 @@ export default function Submitted() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col bg-white">
+    <div className="flex min-h-screen flex-col bg-navy">
       <PhoneHeader>
         <Logo variant="light" className="h-8 w-auto sm:h-9" />
       </PhoneHeader>
@@ -54,10 +54,7 @@ export default function Submitted() {
       <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12">
         <div className="mx-auto w-full max-w-4xl">
           {/* Primary card */}
-          <div
-            className="overflow-hidden rounded-2xl bg-white shadow-2xl"
-            style={{ border: "4px solid #028CC9" }}
-          >
+          <div className="overflow-hidden rounded-2xl bg-white shadow-2xl">
             <div className="px-5 py-8 text-center sm:px-10 sm:py-12 lg:px-14">
               {/* Call incoming alert */}
               <div className="mx-auto max-w-sm rounded-xl border-2 border-brand bg-navy px-6 py-6 shadow-lg">
@@ -110,10 +107,7 @@ export default function Submitted() {
             </div>
 
             {/* What happens next */}
-            <div
-              className="px-5 py-10 sm:px-10 lg:px-14"
-              style={{ backgroundColor: "#FFFFFF", borderTop: "4px solid #028CC9", borderBottom: "4px solid #028CC9", borderLeft: "4px solid #028CC9", borderRight: "4px solid #028CC9" }}
-            >
+            <div className="border-t border-slate-100 bg-slate-50 px-5 py-10 sm:px-10 lg:px-14">
               <h2 className="flex items-center justify-center gap-2 font-heading text-xl font-bold text-navy sm:text-2xl">
                 <Clock className="h-5 w-5 text-brand" /> What happens next
               </h2>
@@ -122,7 +116,9 @@ export default function Submitted() {
                 {STEPS.map((step, i) => (
                   <li
                     key={i}
-                    className="relative rounded-xl bg-white px-5 py-4"
+                    className={`relative rounded-xl border bg-white px-5 py-4 ${
+                      step.now ? "border-brand ring-1 ring-brand/30" : "border-slate-200"
+                    }`}
                   >
                     {step.now && (
                       <span className="absolute -top-2.5 right-4 rounded-full bg-brand px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
@@ -156,7 +152,7 @@ export default function Submitted() {
           {/* Trust row */}
           <ul className="mt-8 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
             {TRUST.map((item) => (
-              <li key={item} className="flex items-center gap-2 text-sm font-bold text-brand">
+              <li key={item} className="flex items-center gap-2 text-sm text-white/70">
                 <Check className="h-4 w-4 shrink-0 text-brand" /> {item}
               </li>
             ))}
@@ -168,7 +164,7 @@ export default function Submitted() {
       <section className="px-4 pb-10 sm:px-6">
         <div
           className="mx-auto flex max-w-4xl items-center gap-6 rounded-2xl px-6 py-8 shadow-lg sm:px-10 sm:py-10"
-          style={{ backgroundColor: "#1D2C3B" }}
+          style={{ backgroundColor: "#028CC9" }}
         >
           <div className="flex-1 text-left">
             <h2 className="font-heading text-xl font-extrabold uppercase tracking-tight text-white sm:text-2xl">
