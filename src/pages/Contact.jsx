@@ -17,23 +17,11 @@ export default function Contact() {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
-    const [first_name, ...rest] = form.name.trim().split(" ");
-    const params = new URLSearchParams(window.location.search);
     try {
-      const res = await base44.functions.invoke("ingestLead", {
-        first_name: first_name || form.name,
-        last_name: rest.join(" ") || undefined,
+      const res = await base44.functions.invoke("sendContactEmail", {
+        name: form.name,
         email: form.email,
-        notes: form.message,
-        source: "contact_form",
-        source_ref: "site_contact_page",
-        landing_url: window.location.href,
-        referrer_url: document.referrer || undefined,
-        utm_source: params.get("utm_source") || undefined,
-        utm_medium: params.get("utm_medium") || undefined,
-        utm_campaign: params.get("utm_campaign") || undefined,
-        utm_content: params.get("utm_content") || undefined,
-        utm_term: params.get("utm_term") || undefined,
+        message: form.message,
       });
       if (res?.data?.ok === false || res?.ok === false) {
         setError((res.data || res).error || "Something went wrong. Please try again.");
@@ -41,9 +29,6 @@ export default function Contact() {
         setSent(true);
       }
     } catch (err) {
-      // A dead endpoint must never cost the submission from the visitor's
-      // point of view being confusing — but we do surface a real error here
-      // since this is a direct form, not a fire-and-forget background call.
       setError(err?.message || "Something went wrong. Please try again.");
     }
     setSubmitting(false);
