@@ -52,7 +52,7 @@ export default function Submitted() {
       </PhoneHeader>
 
       <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12">
-        <div className="mx-auto w-full max-w-4xl">
+        <div className="mx-auto w-full max-w-5xl">
           {/* Primary card */}
           <div className="overflow-hidden rounded-2xl bg-white shadow-2xl" style={{ border: "4px solid #028CC9" }}>
             <div className="px-5 py-8 text-center sm:px-10 sm:py-12 lg:px-14">
@@ -164,7 +164,7 @@ export default function Submitted() {
       {/* No Win, No Fee guarantee banner */}
       <section className="px-4 pb-10 sm:px-6">
         <div
-          className="mx-auto flex max-w-4xl items-center gap-6 rounded-2xl px-6 py-8 sm:px-10 sm:py-10"
+          className="mx-auto flex max-w-5xl items-center gap-6 rounded-2xl px-6 py-8 sm:px-10 sm:py-10"
           style={{ backgroundColor: "#028CC9", border: "4px solid #028CC9" }}
         >
           <div className="flex-1 text-left">
