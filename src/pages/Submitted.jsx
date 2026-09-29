@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { Phone, Clock, Check, PhoneCall } from "lucide-react";
 import { SITE } from "@/lib/siteContent";
+import PublicFooter from "@/components/site/PublicFooter";
 
 // Post-submission page: the lead has completed the quiz and a specialist is
 // about to call. The single job of this page is to get them to answer that
@@ -42,8 +43,8 @@ export default function Submitted() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-navy px-4 py-10 sm:px-6 sm:py-14">
-      <div className="mx-auto w-full max-w-2xl">
+    <main className="flex min-h-screen flex-col bg-navy">
+      <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-10 sm:px-6 sm:py-14">
         {/* Primary card */}
         <div className="overflow-hidden rounded-2xl bg-white shadow-2xl">
           <div className="px-6 py-10 text-center sm:px-10 sm:py-12">
@@ -152,11 +153,9 @@ export default function Submitted() {
             </li>
           ))}
         </ul>
-
-        <p className="mt-10 text-center text-xs text-white/35">
-          &copy; {new Date().getFullYear()} Next Consulting LLC. All rights reserved. Not a law firm.
-        </p>
       </div>
+
+      <PublicFooter />
     </main>
   );
 }
