@@ -266,4 +266,5 @@ export function Terms() { return <LegalPage slug="terms" />; }
 export function PrivacyChoices() { return <LegalPage slug="privacy-choices" />; }
 export function Disclosures() { return <LegalPage slug="disclosures" />; }
 export function Partners() { return <LegalPage slug="partners" />; }
+export function CANotice() { return <LegalPage slug="ca-notice" />; }
 export default LegalPage;

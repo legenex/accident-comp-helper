@@ -27,7 +27,7 @@ import AccidentTypes from '@/pages/AccidentTypes';
 import Resources from '@/pages/Resources';
 import Blog from '@/pages/Blog';
 import BlogDetail from '@/pages/BlogDetail';
-import { Privacy, Terms, PrivacyChoices, Disclosures, Partners } from '@/pages/LegalPages';
+import { Privacy, Terms, PrivacyChoices, Disclosures, Partners, CANotice } from '@/pages/LegalPages';
 import ClaimCheck from '@/pages/ClaimCheck';
 import Submitted from '@/pages/Submitted';
 import Thanks from '@/pages/Thanks';
@@ -111,6 +111,7 @@ const AuthenticatedApp = () => {
         <Route path="/privacy-choices" element={<PrivacyChoices />} />
         <Route path="/disclosures" element={<Disclosures />} />
         <Route path="/partners" element={<Partners />} />
+        <Route path="/ca-notice" element={<CANotice />} />
       </Route>
 
       {/* Claim flow + standalone public routes */}
