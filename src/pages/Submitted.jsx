@@ -46,7 +46,7 @@ export default function Submitted() {
   }, []);
 
   return (
-    <div className="flex min-h-screen flex-col bg-navy">
+    <div className="flex min-h-screen flex-col bg-white">
       <PhoneHeader>
         <Logo variant="light" className="h-8 w-auto sm:h-9" />
       </PhoneHeader>
@@ -54,7 +54,10 @@ export default function Submitted() {
       <main className="flex-1 px-4 py-8 sm:px-6 sm:py-12">
         <div className="mx-auto w-full max-w-4xl">
           {/* Primary card */}
-          <div className="overflow-hidden rounded-2xl bg-white shadow-2xl">
+          <div
+            className="overflow-hidden rounded-2xl bg-white shadow-2xl"
+            style={{ border: "4px solid #028CC9" }}
+          >
             <div className="px-5 py-8 text-center sm:px-10 sm:py-12 lg:px-14">
               {/* Call incoming alert */}
               <div className="mx-auto max-w-sm rounded-xl border-2 border-brand bg-navy px-6 py-6 shadow-lg">
