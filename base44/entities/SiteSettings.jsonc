@@ -1,0 +1,44 @@
+{
+  "name": "SiteSettings",
+  "type": "object",
+  "description": "Singleton \u2014 site identity and branding. The admin UI keeps exactly one record and updates it in place.",
+  "properties": {
+    "site_name": {
+      "type": "string",
+      "default": "Accident Compensation Helper"
+    },
+    "domain": {
+      "type": "string",
+      "default": "accidentcompensationhelper.com"
+    },
+    "quiz_url": {
+      "type": "string",
+      "default": "https://quiz.accidentcompensationhelper.com/s/eval"
+    },
+    "support_email": {
+      "type": "string"
+    },
+    "support_phone": {
+      "type": "string"
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "notify_new_lead_email": {
+      "type": "boolean",
+      "default": true
+    },
+    "notify_weekly_summary": {
+      "type": "boolean",
+      "default": true
+    },
+    "notify_slack_alerts": {
+      "type": "boolean",
+      "default": false
+    },
+    "notify_slack_webhook_secret_ref": {
+      "type": "string"
+    }
+  },
+  "required": []
+}

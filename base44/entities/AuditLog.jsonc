@@ -1,0 +1,26 @@
+{
+  "name": "AuditLog",
+  "type": "object",
+  "description": "Best-effort log of meaningful admin actions. A failure to write this must never block or fail the action the user asked for. Credential-shaped strings are redacted before storage; full personal data is never logged into the summary.",
+  "properties": {
+    "actor_email": {
+      "type": "string"
+    },
+    "action": {
+      "type": "string",
+      "description": "e.g. lead.recalculate, webhook.update, custom_field.delete"
+    },
+    "entity_type": {
+      "type": "string"
+    },
+    "entity_id": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "action"
+  ]
+}

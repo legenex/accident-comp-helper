@@ -1,0 +1,35 @@
+{
+  "name": "Integration",
+  "type": "object",
+  "description": "Third-party connections not covered by the Webhooks tool (e.g. analytics, CRM). Credentials are secret references only.",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "provider": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "connected",
+        "not_configured",
+        "error"
+      ],
+      "default": "not_configured"
+    },
+    "secret_ref": {
+      "type": "string"
+    },
+    "config": {
+      "type": "object"
+    },
+    "last_checked_at": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "provider"
+  ]
+}

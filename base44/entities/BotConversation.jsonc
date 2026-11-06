@@ -1,0 +1,33 @@
+{
+  "name": "BotConversation",
+  "type": "object",
+  "description": "One ClaimBot conversation transcript, for the operational Bot admin view.",
+  "properties": {
+    "session_id": {
+      "type": "string"
+    },
+    "lead_id": {
+      "type": "string"
+    },
+    "transcript": {
+      "type": "array",
+      "description": "[{role: 'user'|'bot', content, at}]"
+    },
+    "outcome": {
+      "type": "string",
+      "enum": [
+        "ongoing",
+        "handed_off",
+        "abandoned"
+      ],
+      "default": "ongoing"
+    },
+    "is_test": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "session_id"
+  ]
+}

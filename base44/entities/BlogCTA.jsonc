@@ -1,0 +1,31 @@
+{
+  "name": "BlogCTA",
+  "type": "object",
+  "description": "Reusable CTA templates insertable into blog posts.",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "headline": {
+      "type": "string"
+    },
+    "body": {
+      "type": "string"
+    },
+    "button_text": {
+      "type": "string",
+      "default": "Check my claim"
+    },
+    "button_url": {
+      "type": "string",
+      "default": "https://quiz.accidentcompensationhelper.com/s/eval"
+    },
+    "is_default": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "name"
+  ]
+}

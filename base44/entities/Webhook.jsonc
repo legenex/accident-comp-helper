@@ -1,0 +1,77 @@
+{
+  "name": "Webhook",
+  "type": "object",
+  "description": "An outbound destination. Auth is a secret reference name only \u2014 the credential itself is read from the environment at delivery time and never stored here.",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "provider": {
+      "type": "string",
+      "description": "e.g. leadbyte, generic_http, buyer_name"
+    },
+    "endpoint_url": {
+      "type": "string"
+    },
+    "http_method": {
+      "type": "string",
+      "enum": [
+        "POST",
+        "GET",
+        "PUT"
+      ],
+      "default": "POST"
+    },
+    "auth_secret_ref": {
+      "type": "string",
+      "description": "Name of an environment secret, e.g. LEADBYTE_API_KEY. Never the credential value itself."
+    },
+    "triggers": {
+      "type": "array",
+      "description": "Lead lifecycle events this fires on, e.g. ['lead.created','lead.qualified']"
+    },
+    "conditions": {
+      "type": "array",
+      "description": "[{field, operator, value}] \u2014 ALL must pass for this webhook to fire"
+    },
+    "payload_mapping": {
+      "type": "object",
+      "description": "Outbound key -> literal value or '{{token}}' resolved from the record (Lead field, custom_fields key, or calculated_fields token)"
+    },
+    "timeout_ms": {
+      "type": "number",
+      "default": 8000
+    },
+    "retry_policy": {
+      "type": "string",
+      "enum": [
+        "none",
+        "3x",
+        "5x"
+      ],
+      "default": "3x"
+    },
+    "enabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "last_delivery_at": {
+      "type": "string"
+    },
+    "last_delivery_status": {
+      "type": "string"
+    },
+    "success_count": {
+      "type": "number",
+      "default": 0
+    },
+    "failure_count": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "endpoint_url"
+  ]
+}

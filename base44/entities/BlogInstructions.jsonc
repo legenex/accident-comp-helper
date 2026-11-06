@@ -1,0 +1,22 @@
+{
+  "name": "BlogInstructions",
+  "type": "object",
+  "description": "Base instructions AI generation is grounded in, plus the banned-pattern compliance list that blocks publishing while flags remain. Singleton \u2014 the admin UI keeps one active record.",
+  "properties": {
+    "brand_voice": {
+      "type": "string"
+    },
+    "base_instructions": {
+      "type": "string"
+    },
+    "banned_patterns": {
+      "type": "array",
+      "description": "List of strings/phrases that block publishing when matched, e.g. guaranteed settlement claims, specific dollar-amount promises"
+    },
+    "humanizer_enabled": {
+      "type": "boolean",
+      "default": true
+    }
+  },
+  "required": []
+}

@@ -4,75 +4,6 @@ import { Button } from "@/components/ui/button";
 import { ShieldCheck, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 
-const OPERATION_VERBS = { read: "view", create: "create", update: "edit", delete: "delete" };
-const COLLAPSED_DATA_ROWS = 6;
-
-// Entity tools arrive one per operation; show each entity once, naming only the
-// operations it actually grants.
-function groupTools(tools) {
-  const operationsByEntity = new Map();
-  const agents = [];
-  const actions = [];
-  for (const tool of tools) {
-    if (tool.kind === "entity" && tool.entity) {
-      if (!operationsByEntity.has(tool.entity)) operationsByEntity.set(tool.entity, []);
-      operationsByEntity.get(tool.entity).push(tool.operation);
-    } else if (tool.kind === "agent") {
-      agents.push(tool);
-    } else {
-      actions.push(tool);
-    }
-  }
-  const data = [...operationsByEntity].map(([entity, operations]) => ({
-    entity,
-    operations: Object.keys(OPERATION_VERBS).filter((op) => operations.includes(op)),
-  }));
-  return { data, agents, actions };
-}
-
-const humanize = (name) =>
-  name.split(/[_-]+/).filter(Boolean).map((word) => word[0].toUpperCase() + word.slice(1)).join(" ") || name;
-
-// "View, create and delete records" — delete is emphasized so it doesn't hide
-// among harmless verbs.
-function OperationSummary({ operations }) {
-  return (
-    <>
-      {operations.map((op, i) => {
-        const verb = OPERATION_VERBS[op];
-        const separator = i === 0 ? "" : i === operations.length - 1 ? " and " : ", ";
-        return (
-          <React.Fragment key={op}>
-            {separator}
-            <span className={op === "delete" ? "font-medium text-destructive" : undefined}>
-              {i === 0 ? verb[0].toUpperCase() + verb.slice(1) : verb}
-            </span>
-          </React.Fragment>
-        );
-      })}{" "}
-      records
-    </>
-  );
-}
-
-function ToolSection({ title, children }) {
-  return (
-    <section>
-      <h3 className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">{title}</h3>
-      <ul className="divide-y divide-border rounded-lg border border-border">{children}</ul>
-    </section>
-  );
-}
-
-function ToolRow({ title, children }) {
-  return (
-    <li className="flex flex-col gap-0.5 px-3 py-2">
-      <span className="font-medium text-foreground">{title}</span>
-      {children && <span className="text-muted-foreground">{children}</span>}
-    </li>
-  );
-}
-
 // App-side OAuth consent page for the app's MCP server. The platform redirects
 // AI clients here (see base44/mcp/config.json `consent_path`) with an opaque
 // `ctx` handle — the authorization request itself lives on the server. This page
@@ -88,7 +19,6 @@ export default function OAuthConsent() {
   const [decided, setDecided] = useState("");
   const [error, setError] = useState("");
   const [reconnect, setReconnect] = useState("");
-  const [showAllData, setShowAllData] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -255,7 +185,6 @@ export default function OAuthConsent() {
   }
 
   const tools = Array.isArray(info.tools) ? info.tools : [];
-  const { data, agents, actions } = groupTools(tools);
 
   return (
     <AuthLayout
@@ -269,50 +198,22 @@ export default function OAuthConsent() {
         </div>
       )}
 
-      <p className="text-sm font-medium text-foreground mb-3">
-        {tools.length ? `${client} will be able to:` : "No tools requested"}
+      <p className="text-sm font-medium text-foreground mb-2">
+        {tools.length ? `It will be able to use these tools in ${appName}:` : "No tools requested"}
       </p>
       {tools.length > 0 && (
-        <div className="space-y-4 text-sm mb-6">
-          {data.length > 0 && (
-            <ToolSection title={`Data (${data.length})`}>
-              {(showAllData ? data : data.slice(0, COLLAPSED_DATA_ROWS)).map(({ entity, operations }) => (
-                <ToolRow key={entity} title={entity}>
-                  <OperationSummary operations={operations} />
-                </ToolRow>
-              ))}
-              {data.length > COLLAPSED_DATA_ROWS && (
-                <li className="px-3 py-2">
-                  <button
-                    type="button"
-                    className="text-sm font-medium text-primary hover:underline"
-                    onClick={() => setShowAllData((shown) => !shown)}
-                  >
-                    {showAllData ? "Show less" : `Show all ${data.length}`}
-                  </button>
-                </li>
+        <ul className="space-y-2 text-sm mb-6">
+          {tools.map((tool) => (
+            <li key={tool.name} className="flex flex-col">
+              <span className="text-foreground font-medium">
+                {tool.title || tool.name}
+              </span>
+              {tool.description && (
+                <span className="text-muted-foreground">{tool.description}</span>
               )}
-            </ToolSection>
-          )}
-          {agents.length > 0 && (
-            <ToolSection title="Agents">
-              {agents.map((tool) => (
-                <ToolRow key={tool.name} title={tool.agent ? humanize(tool.agent) : tool.title || tool.name}>
-                  {tool.description}
-                </ToolRow>
-              ))}
-            </ToolSection>
-          )}
-          {actions.length > 0 && (
-            <ToolSection title="Actions">
-              {actions.map((tool) => (
-                <ToolRow key={tool.name} title={tool.title || tool.name}>
-                  {tool.description}
-                </ToolRow>
-              ))}
-            </ToolSection>
-          )}
-        </div>
+            </li>
+          ))}
+        </ul>
       )}
 
       <div className="flex gap-3">

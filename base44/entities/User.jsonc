@@ -1,0 +1,20 @@
+{
+  "properties": {
+    "role": {
+      "type": "string",
+      "description": "The role of the user in the app. 'user' is the legacy value from before the owner/admin/editor/analyst model existed and is treated as 'analyst' by the admin panel; existing records are left as-is rather than force-migrated.",
+      "enum": [
+        "owner",
+        "admin",
+        "editor",
+        "analyst",
+        "user"
+      ]
+    }
+  },
+  "required": [
+    "role"
+  ],
+  "name": "User",
+  "type": "object"
+}

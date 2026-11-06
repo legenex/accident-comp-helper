@@ -1,0 +1,102 @@
+{
+  "auth": "oauth",
+  "tools": {
+    "functions": [
+      {
+        "name": "chat_with_claimbot",
+        "title": "Chat with ClaimBot",
+        "description": "Send a conversation message to the ClaimBot assistant and get a reply. Pass the full message history as an array of {role, content} objects (role is 'user' or 'assistant'). Optionally provide a session_id to persist the transcript and persist: true to save it. Use this when an AI client needs the in-app bot's compliant, knowledge-grounded answer about accident claims.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "messages": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "role": { "type": "string", "description": "Either 'user' or 'assistant'" },
+                  "content": { "type": "string" }
+                },
+                "required": ["role", "content"]
+              },
+              "description": "The conversation history. Must be a non-empty array."
+            },
+            "session_id": { "type": "string", "description": "Optional session identifier used to persist and retrieve the conversation transcript." },
+            "persist": { "type": "boolean", "description": "When true and session_id is set, the transcript is saved to BotConversation." }
+          },
+          "required": ["messages"]
+        },
+        "handler": "botChat",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": false }
+      },
+      {
+        "name": "ingest_lead",
+        "title": "Ingest a new lead",
+        "description": "Run the full lead capture pipeline (validate, normalize, create Lead record, run calculated fields, fire webhooks) for a new accident claim lead. At least one of email or mobile is required. Accepts canonical lead fields such as first_name, last_name, email, mobile, zip_code, accident_type, accident_state, incident_date, injured, injury_type, treatment, medical_bills, lost_wages, fault, attorney, qualification_status, source, source_ref, utm_source, utm_medium, utm_campaign, and consent fields. Unknown fields are stored on the lead's custom_fields.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "first_name": { "type": "string" },
+            "last_name": { "type": "string" },
+            "email": { "type": "string", "description": "Contact email. At least one of email or mobile is required." },
+            "mobile": { "type": "string", "description": "Contact phone number. At least one of email or mobile is required." },
+            "zip_code": { "type": "string" },
+            "accident_type": { "type": "string" },
+            "accident_state": { "type": "string", "description": "Two-letter US state code where the accident occurred." },
+            "incident_date": { "type": "string" },
+            "injured": { "type": "string" },
+            "source": { "type": "string", "description": "Capture surface, e.g. 'quiz', 'contact', 'landing_page', 'advertorial'." },
+            "source_ref": { "type": "string" },
+            "qualification_status": { "type": "string" },
+            "consent_text": { "type": "string" },
+            "consent_version": { "type": "string" }
+          }
+        },
+        "handler": "ingestLead",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": false }
+      },
+      {
+        "name": "fire_webhooks",
+        "title": "Fire webhooks for a lead",
+        "description": "Dispatch webhook deliveries for a given lead and event. Loads the lead, runs calculated fields, selects matching enabled webhooks, builds payloads, and delivers with retries. Use dry_run: true to preview the resolved payloads without sending anything.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "lead_id": { "type": "string", "description": "The Lead record id to fire webhooks for." },
+            "event": { "type": "string", "description": "The event name, e.g. 'lead.created'." },
+            "event_version": { "type": "string", "description": "Idempotency event version, defaults to '1'." },
+            "webhook_id": { "type": "string", "description": "Restrict delivery to a single webhook by id." },
+            "dry_run": { "type": "boolean", "description": "When true, no delivery is sent; the resolved payloads are returned for inspection." }
+          },
+          "required": ["lead_id", "event"]
+        },
+        "handler": "fireWebhooks",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": false }
+      },
+      {
+        "name": "publish_scheduled_posts",
+        "title": "Publish scheduled blog posts",
+        "description": "Publishes blog posts whose status is 'scheduled' and whose publish_at time has passed, skipping any with unresolved compliance flags. Safe to call repeatedly; only moves scheduled to published. Intended to run on a schedule but can be triggered manually.",
+        "input_schema": { "type": "object", "properties": {} },
+        "handler": "publishScheduledPosts",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": true }
+      },
+      {
+        "name": "run_calculated_fields",
+        "title": "Run calculated fields on a lead",
+        "description": "Runs the calculated-fields engine against a lead. With lead_id only, it runs and persists the results. With dry_run: true it returns the trace without persisting. With a sample object it runs against ad-hoc values (dry-run). With field_id it restricts to a single calculated field.",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "lead_id": { "type": "string", "description": "The Lead record id to run against. Mutually exclusive with sample." },
+            "sample": { "type": "object", "description": "Ad-hoc lead values to run against (dry-run only). Mutually exclusive with lead_id." },
+            "dry_run": { "type": "boolean", "description": "When true, results are returned without persisting." },
+            "field_id": { "type": "string", "description": "Restrict the run to a single CalculatedField by id or token." }
+          }
+        },
+        "handler": "runCalculatedFields",
+        "annotations": { "read_only_hint": false, "destructive_hint": false, "idempotent_hint": false }
+      }
+    ]
+  }
+}

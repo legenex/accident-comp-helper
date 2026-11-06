@@ -1,0 +1,60 @@
+{
+  "name": "WebhookDelivery",
+  "type": "object",
+  "description": "One row per delivery attempt, including retries. Credentials are redacted before storage \u2014 any key matching token|secret|key|password|authorization is masked.",
+  "properties": {
+    "webhook_id": {
+      "type": "string"
+    },
+    "lead_id": {
+      "type": "string"
+    },
+    "event": {
+      "type": "string",
+      "description": "e.g. lead.created"
+    },
+    "event_version": {
+      "type": "string",
+      "default": "1"
+    },
+    "idempotency_key": {
+      "type": "string",
+      "description": "leadId:webhookId:event:eventVersion"
+    },
+    "attempt_number": {
+      "type": "number",
+      "default": 1
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "success",
+        "failed",
+        "retrying",
+        "skipped"
+      ],
+      "default": "pending"
+    },
+    "http_status": {
+      "type": "number"
+    },
+    "duration_ms": {
+      "type": "number"
+    },
+    "resolved_payload": {
+      "type": "object",
+      "description": "The exact payload sent, for the Test view and delivery log"
+    },
+    "response_body": {
+      "type": "string"
+    },
+    "error_message": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "webhook_id",
+    "event"
+  ]
+}
